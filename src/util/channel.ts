@@ -13,4 +13,5 @@ export class channel {
         this.value = value;
         this.endDate = new Date(Number(endDate)*1000);
     }
+
 }

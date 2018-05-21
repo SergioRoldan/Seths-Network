@@ -146,7 +146,7 @@ export class AppComponent {
     if (!canBeNumber(amount))
       return false;
 
-    if (+amount < 0 || +amount > this.nearBalance || +amount > (100*10**18))
+    if (+amount < 0 || +amount > this.nearBalance || +amount > (100000000000000000000))
       return false;
 
     return true;
