@@ -25,4 +25,4 @@ In root dir of the project:
 - Run Ganache or similar
 - To compile and deploy contracts: #truffle migrate 
 - I. To start the client: #npm run electron-build
-- II. Alternative to start the client use ng serve, point index.html to localhost:4200 and then npm run electron
+- II. Alternative to start the client use ng serve, point index.html to localhost:4200 and githen npm run electron
