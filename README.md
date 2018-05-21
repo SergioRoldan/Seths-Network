@@ -2,26 +2,27 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.3.
 
-## Development server
+Tested in Windows 10
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+# Requirements
 
-## Code scaffolding
+Nmp 5.6.0 or -
+Truffle 4.0.0 or +
+Ganache, Geth, Testrpc or similar (default port 7545)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Clone project using: #git clone https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box.git
+Install modules in the root of the project using: #npm install
 
-## Build
+Include/modify the next line in the file 'node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js':
+    node: {crypto:true, stream:true}
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+// This solves Angular 6 strip of crypto and stream libraries, which are truffle-contracts dependencies
 
-## Running unit tests
+## Run
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+In root dir of the project:
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+- Run Ganache or similar
+- To compile and deploy contracts: #truffle migrate 
+- I. To start the client: #npm run electron-build
+- II. Alternative to start the client use ng serve, point index.html to localhost:4200 and then npm run electron
