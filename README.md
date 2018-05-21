@@ -15,8 +15,7 @@ Clone project using: #git clone https://github.com/SergioRoldan/Angular6-Truffle
 Install modules in the root of the project using: #npm install
 
 Include/modify the next line in the file 'node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js':
-    
-   node: {crypto:true, stream:true}
+    node: {crypto:true, stream:true}
 
    - This solves Angular 6 strip of crypto and stream libraries, which are truffle-contracts dependencies
 
