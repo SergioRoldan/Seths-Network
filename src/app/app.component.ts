@@ -1,8 +1,11 @@
 import {Component} from '@angular/core';
+
 import {canBeAddress} from '../util/validation';
 import {canBeDays} from '../util/validation';
 import {canBeNumber} from '../util/validation';
 import {channel} from '../util/channel';
+import {Web3Service} from './web3.service';
+import {account} from '../util/account';
 
 const Web3 = require('web3');
 const Web3Utils = require('web3-utils');
@@ -20,7 +23,8 @@ export class AppComponent {
   Factory = contract(factoryArtifacts);
   Channel = contract(channelArtifacts);
 
-  accounts: any;
+  accounts: account[] = [];
+  channels: channel[] = [];
   web3: any;
 
   near: any;
@@ -39,74 +43,29 @@ export class AppComponent {
 
   channelInfo: channel;
 
-  constructor() {
-    this.checkAndInstantiateWeb3();
-    this.onReady();
+  constructor(private web3Service: Web3Service) {
+
   }
 
-  checkAndInstantiateWeb3() {
-    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-    if (typeof this.web3 !== 'undefined') {
-      console.warn('Using web3 detected from external source. If you find that your accounts don\'t appear or you have ' +
-        '0 Ether, ensure you\'ve configured that source properly.');
-      // Use Mist/MetaMask's provider
-      this.web3 = new Web3(this.web3.currentProvider);
-    } else {
-      console.warn('No web3 detected. Falling back to http://localhost:7545.');
-      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-      this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
-    }
+  ngOnInit() {
+    this.updateAccounts();
+    this.updateChannels();
   }
 
-  onReady() {
-    
-    // Fix difference for httpProvider bettween web3 v1 and web3 v0.20 used by truffle-contract
-    Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send
-
-    // Bootstrap the abstractions for Use.
-    this.Factory.setProvider(this.web3.currentProvider);
-    this.Channel.setProvider(this.web3.currentProvider);
-
-    // Get the initial account balance so it can be displayed.
-    this.web3.eth.getAccounts((err, accs) => {
-      if (err != null) {
-        alert('There was an error fetching your accounts.');
-        return;
-      }
-
-      if (accs.length === 0) {
-        alert('Couldn\'t get any accounts! Make sure your Ethereum client is configured correctly.');
-        return;
-      }
-      this.accounts = accs;
-
-      this.near = this.accounts[0];
-
-      this.web3.eth.getBalance(this.near, (err, val) => {
-        if (err != null) {
-          alert('There was an error fetching balance.');
-          return;
-        }
-        this.nearBalance = this.web3.utils.fromWei(val);
-      });
-      
-      this.far = this.accounts[1];
-      this.web3.eth.getBalance(this.far , (err, val) => {
-        if (err != null) {
-          alert('There was an error fetching balance.');
-          return;
-        }
-        this.farBalance = this.web3.utils.fromWei(val);
-      });
-
-    });
+  updateAccounts() {
+    this.web3Service.getAccounts().subscribe(accs => this.accounts = accs);
   }
 
+  updateChannels() {
+    this.web3Service.getChannels().subscribe(channs => this.channels = channs);
+  }
+  
+  createChannel(){}
 
   setStatus(message: string) {
     this.status = message;
   }
-
+  /*
   createChannel() {
 
     const amount = this.createAmount;
@@ -140,7 +99,7 @@ export class AppComponent {
         console.log(e);
         this.setStatus('Error creating channel coin; see log.');
       });
-  }
+  }*/
 
   enoughEther(amount: string): boolean {
     if (!canBeNumber(amount))
