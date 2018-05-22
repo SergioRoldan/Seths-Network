@@ -8,7 +8,6 @@
         {{acc.address}} has
         <span class="is-medium has-underline">{{acc.balance}}</span> Ether
       </h6>
-      <br>
     </div>
   </div>
 </section>
@@ -16,12 +15,12 @@
 <br>
 
 <div class="container padd">
-  
+
   <h1 class="title">Create channel</h1>
-  <h1 class="title is-4 is-info help">{{status}}</h1>
+  <h1 class="title is-4 is-info help">{{status_create}}</h1>
 
   <form #channelForm="ngForm">
-
+  
     <div class="field">
       <label class="label">Amount</label>
       <p class="control">
@@ -38,7 +37,7 @@
         </p>
       </div>
     </div>
-
+  
     <div class="field">
       <label class="label">Destinatary</label>
       <p class="control">
@@ -56,7 +55,7 @@
         </p>
       </div>
     </div>
-
+  
     <div class="field">
       <label class="label">Days open</label>
       <p class="control">
@@ -73,7 +72,7 @@
         </p>
       </div>
     </div>
-
+  
     <div class="field is-grouped">
       <p class="control">
         <button [disabled]="!channelForm.valid" (click)="createChannel()" class="button is-primary">
@@ -81,23 +80,62 @@
         </button>
       </p>
     </div>
+
   </form>
-
-  <div class="container" *ngIf="channels.length > 0">
-    <h1 class="title">Channel Information</h1>
-    <hr>
-    <div *ngFor="let chann of channels">
-      <p>Address: {{chann.address}}</p>
-      <p>Near End: {{chann.nearEnd}}</p>
-      <p>Far End: {{chann.farEnd}}</p>
-      <p>Value: {{chann.value}} Ether</p>
-      <p>End date: {{chann.endDate}}</p>
-      <hr>
-    </div>
-  </div>
-
-  <strong>Hint:</strong> open the browser developer console to view any errors and warnings.
-
 </div>
 
+<hr>
 
+<div class="container" *ngIf="channels.length > 0">
+  <h1 class="title">Channel Information</h1>
+
+  <div *ngFor="let chann of channels">
+    <p>Address: {{chann.address}}</p>
+    <p>Near End: {{chann.nearEnd}}</p>
+    <p>Far End: {{chann.farEnd}}</p>
+    <p>Value: {{chann.value}} Ether</p>
+    <p>End date: {{chann.endDate}}</p>
+    <p>Accepted: {{chann.accepted}}</p>
+    <hr>
+  </div>
+</div>
+
+<hr>
+
+<div class="container padd" *ngIf="channels.length > 0">
+
+  <h1 class="title">Accept channel</h1>
+  <h1 class="title is-4 is-info help">{{status_accept}}</h1>
+
+  <form #acceptForm="ngForm">
+
+    <div class="field">
+      <label class="label">Channel address</label>
+      <p class="control">
+        <input [(ngModel)]="channelAddress" name="channelAddress" class="input" type="text" placeholder="0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
+          required #channelAddressModel="ngModel">
+      </p>
+      <div *ngIf="channelAddressModel.errors && (channelAddressModel.dirty || channelAddressModel.touched)" class="help is-danger">
+        <p [hidden]="!channelAddressModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!channelAddressModel.errors && (channelAddressModel.dirty || channelAddressModel.touched)" class="help is-danger">
+        <p [hidden]="canBeAddress(channelAddress)">
+          Must be address format
+        </p>
+      </div>
+    </div>
+
+    <div class="field is-grouped">
+      <p class="control">
+        <button [disabled]="!acceptForm.valid" (click)="acceptChannel()" class="button is-primary">
+          Accept channel
+        </button>
+      </p>
+
+    </div>
+  </form>
+</div>
+
+<strong>Hint:</strong> open the browser developer console to view any errors and warnings.

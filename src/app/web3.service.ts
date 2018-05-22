@@ -1,7 +1,8 @@
 import { Injectable, OnInit } from '@angular/core';
 import { channel } from '../util/channel';
 import { account } from '../util/account';
-import {Observable, of} from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { log } from 'util';
 
 const Web3 = require('web3');
 const Web3Utils = require('web3-utils');
@@ -92,7 +93,7 @@ export class Web3Service implements OnInit {
 
     this.Factory.deployed()
       .then((instance) => {
-        console.log('Deployed');
+
         instance.channelProcessed({}, {fromBlock: 0, toBlock: 'latest'}).get((err, res) => {
           if(err != null) {
             alert('There was an error getting event for account X');
@@ -107,18 +108,84 @@ export class Web3Service implements OnInit {
               this.web3.utils.fromWei(chann.args.channelVal.toString()), 
               chann.args.endDate
             ));
-
-            //console.log(chann);
           }
+
         });
+
+        instance.channelProcessed().watch((err, res) => {
+          if(err != null) {
+            alert('There was an error getting event for account X');
+            return;
+          }
+
+          let tmp = new channel(
+            res.args.ContractAddrs,
+            res.args.NearEnd,
+            res.args.FarEnd,
+            this.web3.utils.fromWei(res.args.channelVal.toString()),
+            res.args.endDate
+          )
+
+          this.channels.push(tmp);
+
+          this.channelAcceptedEvent(tmp);
+
+        });
+
       });
 
     return of(this.channels);
   }
 
-  listenNewChannelEvents() {
+  channelAcceptedEvent(channel: channel) {
+    
+    let instance = this.Channel.at(channel.address);
+
+    instance.channelAccepted().watch((error, result) => {
+      if(error != null) {
+        alert('There was an error getting event accepted from channel '+channel.address);
+        return;
+      }
+
+      channel.accepted = true;
+
+      return;
+    });
 
   }
 
+  updateStateEvent(){
+
+  }
+
+  async createNewChannel(receiver, amount, days): Promise<any> {
+    
+    let instance = await this.Factory.deployed();
+
+    return instance.createChannel(receiver, days, {
+      from: this.accounts[0].address,
+      gas: 3000000,
+      value: this.web3.utils.toWei(amount, 'ether')
+    });
+      
+  }
+
+  async acceptChannel(address): Promise<any> {
+    let instance = await this.Channel.at(address);
+
+    return instance.acceptChannel({
+      from: this.accounts[1].address,
+      gas: 3000000
+    });
+  }
+
+  /*async updateState(): Promise<any> {
+    let instance = await this.Channel.at(address);
+
+    return instance.({
+      from: this.accounts[1].address,
+      gas: 3000000
+    });
+  }*/
 
 }

@@ -25,18 +25,16 @@ export class AppComponent {
 
   accounts: account[] = [];
   channels: channel[] = [];
+  //transactions: transaction[] = [];
   web3: any;
-
-  near: any;
-  nearBalance: any;
-  far: any;
-  farBalance: any;
 
   createAmount: number;
   recipientAddress: string;
   daysOpen: number;
+  channelAddress: string;
 
-  status: string;
+  status_create: string;
+  status_accept: string;
 
   canBeAddress = canBeAddress;
   canBeDays = canBeDays;
@@ -59,53 +57,57 @@ export class AppComponent {
   updateChannels() {
     this.web3Service.getChannels().subscribe(channs => this.channels = channs);
   }
-  
-  createChannel(){}
 
-  setStatus(message: string) {
-    this.status = message;
+  updateState() {
+    //this.web3Service.getTransactions().subscribe(trans => this.transactions = trans);
   }
-  /*
+
+  setStatus(message: string, status: string) {
+    if(status == 'create')
+      this.status_create = message;
+    else if(status == 'accept')
+      this.status_create = message
+  }
+  
   createChannel() {
 
     const amount = this.createAmount;
     const receiver = this.recipientAddress;
     const days = this.daysOpen;
 
-    let factory;
+    this.setStatus('Initiating transaction... (please wait)', 'create');
 
-    this.setStatus('Initiating transaction... (please wait)');
+    this.web3Service.createNewChannel(receiver, amount, days).then(result => {
+      if (result.receipt.status == 1)
+        this.setStatus('Transaction complete!', 'create');
+      else if (result.receipt.status == 0)
+        this.setStatus('Error creating channel coin; see log.', 'create');
+    }).catch(error => {
+      console.log("Error creating the channel: "+error);
+    });
+    
+  }
 
-    this.Factory.deployed()
-      .then((instance) => {
-        factory = instance;
-        return factory.createChannel(receiver, days, {
-          from: this.accounts[0],
-          gas: 3000000,
-          value: this.web3.utils.toWei(amount, 'ether')
-        });
-      })
-      .then(() => {
-        this.setStatus('Transaction complete!');
-        factory.channelProcessed().watch((error, results) => {
-          if(!error) {
-            let tmp = results.args;
-            this.channelInfo = new channel(tmp.ContractAddrs, tmp.NearEnd, tmp.FarEnd, this.web3.utils.fromWei(tmp.channelVal.toString()), tmp.endDate);
-            console.log(tmp.channelVal, ' ', tmp.endDate);
-          }
-        });
-      })
-      .catch((e) => {
-        console.log(e);
-        this.setStatus('Error creating channel coin; see log.');
-      });
-  }*/
+  acceptChannel() {
+    const address = this.channelAddress;
+
+    this.setStatus('Initiating transaction... (please wait)', 'accept');
+    
+    this.web3Service.acceptChannel(address).then(result => {
+      if (result.receipt.status == 1)
+        this.setStatus('Transaction complete!', 'accept');
+      else if (result.receipt.status == 0)
+        this.setStatus('Error creating channel coin; see log.', 'accept');
+    }).catch(error => {
+      console.log("Error accepting the channel: " + error);
+    });
+  }
 
   enoughEther(amount: string): boolean {
     if (!canBeNumber(amount))
       return false;
 
-    if (+amount < 0 || +amount > this.nearBalance || +amount > (100000000000000000000))
+    if (+amount < 0 || +amount > (100000000000000000000))
       return false;
 
     return true;

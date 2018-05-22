@@ -35,11 +35,6 @@ contract Expirable {
 contract Multiownable {
     
     address[2] public owners;
-
-    struct Data {
-        address nearEnd;
-        address farEnd;
-    }
     
     constructor (address[2] _owners) internal {
         
@@ -114,9 +109,9 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
     event disputeAccepted(address indexed end, uint256 currentId);
 
-    event rShownAndUsed(bytes32 random);
+    event rsShownAndUsed(bytes32[] randomS, bytes32[] random);
 
-    uint16 constant public limit = 171;
+    uint16 constant public limit = 251;
  
     struct State {
         mapping(address=> uint256) values;
@@ -150,20 +145,20 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
     function updateState(
         address[2] _end_chann, uint256[2] _values_id, uint8 _v, bytes32[2] _r_s, 
-        bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, int256[] _rhValues
+        bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end
         ) public onlyOwners isAccepted notClosed hasNotExpired {
 
-        handleState(_end_chann, _values_id, _v, _r_s, _rsSigned, _rs, _hs, _ttls, _rhValues);
+        handleState(_end_chann, _values_id, _v, _r_s, _rsSigned, _rs, _hs, _ttls, _rhValues, _end);
 
         emit stateUpdated(msg.sender, state.values[msg.sender], _end_chann[0], state.values[getOtherOwner(msg.sender)], state.id);
     }
 
     function disputeState(
         address[2] _end_chann, uint256[2] _values_id, uint8 _v, bytes32[2] _r_s, 
-        bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, int256[] _rhValues
+        bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end
         ) public onlyOwners isAccepted notClosed inSettlementPeriod notDisputed {
 
-        handleState(_end_chann, _values_id, _v, _r_s, _rsSigned, _rs, _hs, _ttls, _rhValues);
+        handleState(_end_chann, _values_id, _v, _r_s, _rsSigned, _rs, _hs, _ttls, _rhValues, _end);
 
         disputed[msg.sender] = true;
         
@@ -173,7 +168,7 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
     function handleState(
         address[2] _end_chann, uint256[2] _values_id, uint8 _v, bytes32[2] _r_s, 
-        bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, int256[] _rhValues
+        bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end
         ) internal {
 
         require(
@@ -187,9 +182,9 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
         bytes32 msgHash;
 
         if(_rsSigned.length > 0)
-          msgHash = keccak256(_values_id, _end_chann, _rsSigned, _hs, _ttls,  _rhValues);
+          msgHash = keccak256(_values_id, _end_chann, _rsSigned, _hs, _ttls,  _rhValues, _end);
         else if(_hs.length > 0)
-          msgHash = keccak256(_values_id, _end_chann, _hs, _ttls,  _rhValues);
+          msgHash = keccak256(_values_id, _end_chann, _hs, _ttls,  _rhValues, _end);
         else
           msgHash = keccak256(_values_id, _end_chann);
 
@@ -200,36 +195,42 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
         state.values[msg.sender] = channelValue - _values_id[0];
 
         if(_hs.length > 0) 
-            checkRshashesIn_hs(_rsSigned, _rs, _hs, _ttls, _rhValues);
+            checkRshashesIn_hs(_rsSigned, _rs, _hs, _ttls, _rhValues, _end);
 
     }
 
-    function checkRshashesIn_hs(bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, int256[] _rhValues) internal {
+    function checkRshashesIn_hs(bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end) internal {
         
-        int256 values;
+        uint256 near;
+        uint256 far;
         uint8 i = 0;
 
         for(i; i < _rsSigned.length; i++) {
             if(_rsSigned[i] != 0x0 && now <= _ttls[i] && CryptoHandler.verifyHash(_rsSigned[i], _hs[i])) {
-                values += _rhValues[i];
-                emit rShownAndUsed(_rsSigned[i]);
+                if(_end[i] == 0)
+                    near += _rhValues[i];
+                else
+                    far += _rhValues[i];
             }
         }
 
-        uint8 j = i;
-
-        for(j; j < (i + _rs.length); j++) {
+        for(uint8 j = i; j < (i + _rs.length); j++) {
             if(_rs[j-i] != 0x0 && now <= _ttls[j] && CryptoHandler.verifyHash(_rs[j-i], _hs[j])) {
-                values += _rhValues[j];
-                emit rShownAndUsed(_rs[j-i]);
+                if(_end[j] == 0)
+                    near += _rhValues[j];
+                else
+                    far += _rhValues[j];
             }
         }
 
+        uint values;
         address higherAddrs;
-        if(values >= 0) {
+
+        if(near >= far) {
+            values = near - far;
             higherAddrs = owners[0];
         } else {
-            values = values + 2*(-values);
+            values = far - near;
             higherAddrs = owners[1];
         }
 
@@ -239,6 +240,8 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
             state.values[higherAddrs] -= uint(values);
             state.values[getOtherOwner(higherAddrs)] += uint(values);
+
+            emit rsShownAndUsed(_rsSigned, _rs);
 
         }
 
