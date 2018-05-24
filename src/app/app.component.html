@@ -86,7 +86,7 @@
 
 <hr>
 
-<div class="container" *ngIf="channels.length > 0">
+<div class="container" *ngIf="channels != null && channels.length > 0">
   <h1 class="title">Channel Information</h1>
 
   <div *ngFor="let chann of channels">
@@ -102,7 +102,7 @@
 
 <hr>
 
-<div class="container padd" *ngIf="channels.length > 0">
+<div class="container padd" *ngIf="channels != null && channels.length > 0">
 
   <h1 class="title">Accept channel</h1>
   <h1 class="title is-4 is-info help">{{status_accept}}</h1>
@@ -123,6 +123,24 @@
       <div *ngIf="!channelAddressModel.errors && (channelAddressModel.dirty || channelAddressModel.touched)" class="help is-danger">
         <p [hidden]="canBeAddress(channelAddress)">
           Must be address format
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Amount</label>
+      <p class="control">
+        <input [(ngModel)]="acceptAmount" name="acceptAmount" class="input" type="text" placeholder="0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
+          required #acceptAmountModel="ngModel">
+      </p>
+      <div *ngIf="acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
+        <p [hidden]="!acceptAmountModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
+        <p [hidden]="enoughEther(acceptAmount)">
+          Must have enough ether and a number
         </p>
       </div>
     </div>
