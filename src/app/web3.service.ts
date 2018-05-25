@@ -23,6 +23,8 @@ export class Web3Service implements OnInit {
   accounts: account[] = [];
   channels: Map<string, channel[]> = new Map();
 
+  contractEvent: any;
+
   private accountsSource = new BehaviorSubject<account[]>(this.accounts);
   private channelsSource = new BehaviorSubject<Map<string, channel[]>>(this.channels);
 
@@ -52,14 +54,56 @@ export class Web3Service implements OnInit {
     this.setProviders();
   }
 
-  updateAccountSource(account: account) {
-    this.accounts.push(account);
-    this.accountsSource.next(this.accounts);
+  updateAccountSource(account: account, modify=false) {
+    if(modify) {
+      this.accounts.forEach((item, index) => {
+        if(item == account) {
+          this.accounts[index] = account;
+          this.accountsSource.next(this.accounts);
+        }
+      });
+    } else {
+      this.accounts.push(account);
+      this.accountsSource.next(this.accounts);
+    }
+  
   }
 
-  updateChannelsSource(channel: channel, account: any) {
-    this.channels.get(account).push(channel);
+  updateChannelsSource(account: any, channel: channel, modify = false) {
+    //console.log(channel)
+
+    if (modify) {
+
+      this.channels.get(account).forEach((item, index) => {
+        if(item.address == channel.address)
+          this.channels.get(account)[index] = channel;
+      });
+
+    } else if (!this.channels.get(account).includes(channel)) {
+      let found = false;
+
+      this.channels.get(account).forEach((item, index) => {
+        if (item.address == channel.address)
+          found = true;
+      });
+
+      if(!found)
+        this.channels.get(account).push(channel);
+    }
+    
+
     this.channelsSource.next(this.channels);
+  }
+
+  updateBalance(account: account) {
+    this.web3.eth.getBalance(account.address, (err, val) => {
+      if (err != null) {
+        alert('There was an error fetching balance of account ' + account.address + ': ' + err);
+        return;
+      }
+      account.balance = val;
+      this.updateAccountSource(account, true);
+    });
   }
 
   retrieveAccounts() {
@@ -73,8 +117,6 @@ export class Web3Service implements OnInit {
         alert('Couldn\'t get any accounts! Make sure your Ethereum client is configured correctly.');
         return;
       }
-
-      console.log(accs);
 
       for (let acc of accs) {
         this.web3.eth.getBalance(acc, (err, val) => {
@@ -102,74 +144,49 @@ export class Web3Service implements OnInit {
 
   }
 
-  channelProcessedEvent(self, from) {
+  newProviders() {
+    this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+
+    // Bootstrap the abstractions for Use.
+    this.Factory.setProvider(this.web3.currentProvider);
+    this.Channel.setProvider(this.web3.currentProvider);
+  }
+
+  channelProcessedEvent(self, from, to) {
     this.Factory.deployed()
       .then((instance) => {
 
-        instance.channelProcessed({ FarEnd: self }).watch((err, res) => {
+        this.contractEvent = instance.channelProcessed({ FarEnd: self }, { fromBlock: 0})
+        
+        this.contractEvent.watch((err, res) => {
           if (err != null) {
             alert('There was an error getting event for account X');
             return;
           }
 
-          let tmp = new channel(
-            res.args.ContractAddrs,
-            res.args.NearEnd,
-            res.args.FarEnd,
-            this.web3.utils.fromWei(res.args.channelVal.toString()),
-            res.args.endDate,
-            this.web3.utils.fromWei(res.args.channelVal.toString()),
-            0
-          );
-
-          this.updateChannelsSource(tmp, self);
-
-          console.log("New channel processed ", this.channels);
-          console.log(res);
-
-          //Think of return the watch promises to stop them when close event fires
-          /*
-          this.channelAcceptedEvent(tmp, 0);
-          this.updateStateEvent(tmp, 0);
-          this.disputeStateEvent(tmp, 0);
-          this.randomShowedEvent(tmp, 0);
-          this.channelCloseRequestEvent(tmp, 0);
-          this.channelCloseEvent(tmp, 0);
-          */
-        });
-
-        instance.channelProcessed({ FarEnd: self }, { fromBlock: from, toBlock: 'latest' }).get((err, res) => {
-          if (err != null) {
-            alert('There was an error getting event for account X');
-            return;
-          }
-
-          for (let chann of res) {
+          //for(let chan of res) {
             let tmp = new channel(
-              chann.args.ContractAddrs,
-              chann.args.NearEnd,
-              chann.args.FarEnd,
-              this.web3.utils.fromWei(chann.args.channelVal.toString()),
-              chann.args.endDate,
-              this.web3.utils.fromWei(chann.args.channelVal.toString()),
+              res.args.ContractAddrs,
+              res.args.NearEnd,
+              res.args.FarEnd,
+              this.web3.utils.fromWei(res.args.channelVal.toString()),
+              res.args.endDate,
+              this.web3.utils.fromWei(res.args.channelVal.toString()),
               0
-            );
+            )
 
-            this.updateChannelsSource(tmp, self);
 
-            console.log("New channel processed ", this.channels);
-            console.log(res);
+            this.updateChannelsSource(self, tmp);
+            //let evt = this.channelAcceptedEvent(self, tmp, 0, to);
+        
+          //}
 
-            /*
-            this.channelAcceptedEvent(tmp, 0);
-            this.updateStateEvent(tmp, 0);
-            this.disputeStateEvent(tmp, 0);
-            this.randomShowedEvent(tmp, 0);
-            this.channelCloseRequestEvent(tmp, 0);
-            this.channelCloseEvent(tmp, 0);
-            */
-          }
-
+          /*this.updateStateEvent(tmp, res.blockNumber, to);
+          this.disputeStateEvent(tmp, res.blockNumber, to);
+          this.randomShowedEvent(tmp, res.blockNumber, to);
+          this.channelCloseRequestEvent(tmp, res.blockNumber, to);
+          this.channelCloseEvent(tmp, res.blockNumber, to);*/
+          
         });
 
       });
@@ -187,42 +204,36 @@ export class Web3Service implements OnInit {
       
   }
 
-  channelAcceptedEvent(channel: channel, from) {
+  channelAcceptedEvent(self, channel, from, to): any {
 
     let instance = this.Channel.at(channel.address);
+    console.log("Fuck it ! ", from, ' ! ', to, ' ! ', channel, ' ! ', self);
 
-    let ev = instance.channelAccepted().watch((error, result) => {
+    let evt = instance.channelAccepted({}, { fromBlock: 0 })
+    
+    evt.watch((error, result) => {
       if (error != null) {
-        alert('There was an error getting event accepted from channel ' + channel.address);
+        alert('There was an error getting event accepted from channel ' + channel);
         return;
       }
+
+      console.log("-> Not limiter watch", result);
+
+      //console.log("Result watch: ", result, from, to, channel.address);
+      
       channel.value = this.web3.utils.fromWei(result.args.totalValue.toString());
       channel.accepted = true;
       channel.farEndValue = this.web3.utils.fromWei(result.args.farEndValue.toString());
 
       console.log("Channel accepted");
 
-      ev.StopWatching();
-    });
-
-    instance.channelAccepted({ fromBlock: from, toBlock: 'latest' }).get((error, result) => {
-      if (error != null) {
-        alert('There was an error getting event accepted from channel ' + channel.address);
-        return;
-      }
+      this.updateChannelsSource(self, channel, true);
       
-      if (result.length > 0) {
-        channel.value = this.web3.utils.fromWei(result.args.totalValue.toString());
-        channel.accepted = true;
-        channel.farEndValue = this.web3.utils.fromWei(result.args.farEndValue.toString());
-
-        console.log("Channel accepted");
-
-        ev.StopWatching();
-      }
-
+      //ev.stopWatching();
     });
 
+    return evt;
+      
   }
 
   async acceptChannel(contract, self, value): Promise<any> {
@@ -231,7 +242,7 @@ export class Web3Service implements OnInit {
     return instance.acceptChannel({
       from: self,
       gas: 300000,
-      value: value
+      value: this.web3.utils.toWei(value, 'ether')
     });
   }
 
@@ -250,10 +261,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  updateStateEvent(channel: channel, from) {
+  updateStateEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    instance.stateUpdated().watch((err, res) => {
+    instance.stateUpdated( {fromBlock:0}).watch((err, res) => {
       if(err != null) {
         alert('There was an error getting event update state from channel ' + channel.address);
         return;
@@ -266,27 +277,12 @@ export class Web3Service implements OnInit {
       console.log("Channel state updated");
     });
 
-    instance.stateUpdated({fromBlock: from, toBlock: 'latest'}).get((err, res) => {
-      if (err != null) {
-        alert('There was an error getting event update state from channel ' + channel.address);
-        return;
-      }
-
-      for(let ch of res) {
-        channel.id = ch.args.currentId;
-        channel.nearEndValue = ch.args.nearEndValue;
-        channel.farEndValue = ch.args.farEndValue;
-
-        console.log("Channel state updated");
-      }
-      
-    });
   }
 
-  randomShowedEvent(channel: channel, from) {
+  randomShowedEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    instance.rsShownAndUsed().watch((err, res) => {
+    instance.rsShownAndUsed( {fromBlock:0} ).watch((err, res) => {
       if (err != null) {
         alert('There was an error getting event random showed from channel ' + channel.address);
         return;
@@ -306,29 +302,6 @@ export class Web3Service implements OnInit {
         }
       }
     });
-
-    instance.rsShownAndUsed({fromBlock: from, toBlock: 'latest'}).get((err, res ) => {
-      if (err != null) {
-        alert('There was an error getting event random showed from channel ' + channel.address);
-        return;
-      }
-
-      for(let ev of res) {
-        for (let ran in ev.args.random) {
-          if (channel.checkRandomHashesInH(ran)) {
-            channel.addRandomLock(ran)
-            console.log("Random showed");
-          }
-        }
-        for (let ran in ev.args.randomS) {
-          if (channel.checkRandomHashesInH(ran)) {
-            channel.addRandomLock(ran)
-            console.log("Random showed");
-          }
-        }
-      }
-
-    })
   }
 
   async disputeState(contract, self, disputeParameters): Promise<any> {
@@ -346,10 +319,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  disputeStateEvent(channel: channel, from) {
+  disputeStateEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    instance.disputeAccepted().watch((error, result) => {
+    instance.disputeAccepted({fromBlock:0}).watch((error, result) => {
       if (error != null) {
         alert('There was an error getting event dispute state from channel ' + channel.address);
         return;
@@ -359,17 +332,6 @@ export class Web3Service implements OnInit {
       return;
     });
 
-    instance.disputeAccepted({ fromBlock: from, toBlock: 'latest' }).get((err, res) => {
-      if (err != null) {
-        alert('There was an error getting event dispute state from channel ' + channel.address);
-        return;
-      }
-
-      for(let ev of res) {
-        console.log("Dispute from " + ev.args.end + " accepted with id " + ev.args.currentId);
-      }
-
-    });
   }
 
   async closeChannel(contract, self, bool): Promise<any> {
@@ -384,10 +346,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  channelCloseRequestEvent(channel: channel, from) {
+  channelCloseRequestEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    instance.closeRequest().watch((err, res) => {
+    instance.closeRequest({fromBlock:0}).watch((err, res) => {
       if (err != null) {
         alert('There was an error getting event close request from channel ' + channel.address);
         return;
@@ -397,16 +359,6 @@ export class Web3Service implements OnInit {
 
     });
 
-    instance.closeRequest({fromBlock: from, toBlock: 'latest'}).get((err, res) => {
-      if (err != null) {
-        alert('There was an error getting event close request from channel ' + channel.address);
-        return;
-      }
-
-      for(let ev of res)
-        console.log("Close request from " + ev.args.end + " changed to " + ev.args.closeChange);
-
-    });
   }
 
   async unlockFunds(contract, self): Promise<any> {
@@ -420,10 +372,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  channelCloseEvent(channel: channel, from) {
+  channelCloseEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    let ev = instance.channelClosed().watch((err, res) => {
+    let ev = instance.channelClosed({fromBlock:0}).watch((err, res) => {
       if (err != null) {
         alert('There was an error getting event close from channel ' + channel.address);
         return;
@@ -435,24 +387,12 @@ export class Web3Service implements OnInit {
       channel.id = res.args.finalId;
 
       console.log("Channel closed");
-      ev.StopWatching();
+      ev.stopWatching();
     });
 
-    instance.channelClosed({fromBlock: from, toBlock: 'latest'}).get((err, res) => {
-      if (err != null) {
-        alert('There was an error getting event close from channel ' + channel.address);
-        return;
-      }
+  }
 
-      if(res.length > 0) {
-        channel.setClosed();
-        channel.nearEndValue = res.args.nearEndFinalValue;
-        channel.farEndValue = res.args.farEndFinalValue;
-        channel.id = res.args.finalId;
-
-        console.log("Channel closed");
-        ev.StopWatching();
-      }
-    });
+  sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
   }
 }

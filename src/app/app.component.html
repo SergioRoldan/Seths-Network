@@ -130,7 +130,7 @@
     <div class="field">
       <label class="label">Amount</label>
       <p class="control">
-        <input [(ngModel)]="acceptAmount" name="acceptAmount" class="input" type="text" placeholder="0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
+        <input [(ngModel)]="acceptAmount" name="acceptAmount" class="input" type="text" placeholder="1 Ether"
           required #acceptAmountModel="ngModel">
       </p>
       <div *ngIf="acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
