@@ -1,0 +1,21 @@
+<div class="container center">
+  <h5 class="title is-4"> Account {{account.address}}</h5>
+  <p>
+    Address: {{account.address}}
+  </p>
+  <p>
+    Balance: {{account.balance}}
+  </p>
+
+  <router-outlet></router-outlet>
+
+  <button (click)="navigateRoot()" class="button is-primary">
+    Go back
+  </button>
+
+  <button [routerLink]="['./channels']" class="button is-primary">
+    Go back
+  </button>
+
+</div>
+

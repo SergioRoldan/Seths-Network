@@ -1,0 +1,180 @@
+<div class="container center" *ngIf="accounts != null && accounts.length > 0">
+  <h5 class="title is-4"> Accounts</h5>
+  <table>
+    <thead>
+      <td>
+        <b>Address</b>
+      </td>
+      <td>
+        <b>Balance</b>
+      </td>
+    </thead>
+    <tbody>
+      <tr *ngFor="let acc of accounts" [class.highlighted]="acc === selectedAccount" (click)="selectAccount(acc)">
+        <td>{{acc.address}}</td>
+        <td>{{acc.balance}} Ethers</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<br>
+
+<!--
+  <div class="container padd">
+  
+    <h5 class="title is-4">Create channel</h5>
+    <h5 class="title is-5 is-info help">{{status_create}}</h5>
+  
+    <form #channelForm="ngForm">
+  
+      <div class="field">
+        <label class="label">Amount</label>
+        <p class="control">
+          <input [(ngModel)]="createAmount" class="input" type="text" placeholder="1 Ether" name="createAmount" required #createAmountModel="ngModel">
+        </p>
+        <div *ngIf="createAmountModel.errors && (createAmountModel.dirty || createAmountModel.touched)" class="help is-danger">
+          <p [hidden]="!createAmountModel.errors.required">
+            This field is required
+          </p>
+        </div>
+        <div *ngIf="!createAmountModel.errors && (createAmountModel.dirty || createAmountModel.touched)" class="help is-danger">
+          <p [hidden]="enoughEther(createAmount)">
+            Must have enough ether and a number
+          </p>
+        </div>
+      </div>
+  
+      <div class="field">
+        <label class="label">Destinatary</label>
+        <p class="control">
+          <input [(ngModel)]="recipientAddress" name="recipientAddress" class="input" type="text" placeholder="0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
+            required #recipientAddressModel="ngModel">
+        </p>
+        <div *ngIf="recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)" class="help is-danger">
+          <p [hidden]="!recipientAddressModel.errors.required">
+            This field is required
+          </p>
+        </div>
+        <div *ngIf="!recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)" class="help is-danger">
+          <p [hidden]="canBeAddress(recipientAddress)">
+            Must be address format
+          </p>
+        </div>
+      </div>
+  
+      <div class="field">
+        <label class="label">Days open</label>
+        <p class="control">
+          <input [(ngModel)]="daysOpen" name="daysOpen" class="input" type="text" placeholder="30 days" required #daysOpenModel="ngModel">
+        </p>
+        <div *ngIf="daysOpenModel.errors && (daysOpenModel.dirty || daysOpenModel.touched)" class="help is-danger">
+          <p [hidden]="!daysOpenModel.errors.required">
+            This field is required
+          </p>
+        </div>
+        <div *ngIf="!daysOpenModel.errors && (daysOpenModel.dirty || daysOpenModel.touched)" class="help is-danger">
+          <p [hidden]="canBeDays(daysOpen)">
+            Must be in days format
+          </p>
+        </div>
+      </div>
+  
+      <div class="field is-grouped">
+        <p class="control">
+          <button [disabled]="!channelForm.valid" (click)="createChannel()" class="button is-primary">
+            Create channel
+          </button>
+        </p>
+      </div>
+  
+    </form>
+  </div>
+  
+  <br>
+  
+  <div class="container" *ngIf="channels != null && channels.length > 0">
+  
+    <h5 class="title is-4"> Channels</h5>
+    <table>
+      <thead>
+        <td>
+          <b>Address</b>
+        </td>
+        <td>
+          <b>Value</b>
+        </td>
+        <td>
+          <b>End Date</b>
+        </td>
+        <td>
+          <b>Accepted</b>
+        </td>
+      </thead>
+      <tbody>
+        <tr *ngFor="let chann of channels" [class.highlighted]="chann === selectedChannel" (click)="selectChannel(chann)">
+          <td>{{chann.address}}</td>
+          <td>{{chann.value}}</td>
+          <td>{{chann.endDate}}</td>
+          <td>{{chann.accepted}}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+  </div>
+  
+  <br>
+  
+  <div class="container padd" *ngIf="channels != null && channels.length > 0">
+  
+    <h5 class="title is-4">Accept channel</h5>
+    <h5 class="title is-5 is-info help">{{status_accept}}</h5>
+  
+    <form #acceptForm="ngForm">
+  
+      <div class="field">
+        <label class="label">Channel address</label>
+        <p class="control">
+          <input [(ngModel)]="channelAddress" name="channelAddress" class="input" type="text" placeholder="0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
+            required #channelAddressModel="ngModel">
+        </p>
+        <div *ngIf="channelAddressModel.errors && (channelAddressModel.dirty || channelAddressModel.touched)" class="help is-danger">
+          <p [hidden]="!channelAddressModel.errors.required">
+            This field is required
+          </p>
+        </div>
+        <div *ngIf="!channelAddressModel.errors && (channelAddressModel.dirty || channelAddressModel.touched)" class="help is-danger">
+          <p [hidden]="canBeAddress(channelAddress)">
+            Must be address format
+          </p>
+        </div>
+      </div>
+  
+      <div class="field">
+        <label class="label">Amount</label>
+        <p class="control">
+          <input [(ngModel)]="acceptAmount" name="acceptAmount" class="input" type="text" placeholder="1 Ether" required #acceptAmountModel="ngModel">
+        </p>
+        <div *ngIf="acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
+          <p [hidden]="!acceptAmountModel.errors.required">
+            This field is required
+          </p>
+        </div>
+        <div *ngIf="!acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
+          <p [hidden]="enoughEther(acceptAmount)">
+            Must have enough ether and a number
+          </p>
+        </div>
+      </div>
+  
+      <div class="field is-grouped">
+        <p class="control">
+          <button [disabled]="!acceptForm.valid" (click)="acceptChannel()" class="button is-primary">
+            Accept channel
+          </button>
+        </p>
+  
+      </div>
+    </form>
+  </div>
+-->

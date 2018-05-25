@@ -12,8 +12,9 @@ th, td {
     text-align: left;
 }
 
-.accounts {
+.center {
   margin-top: 20px;
+  margin: 0 auto;
 }
 
 .blue {

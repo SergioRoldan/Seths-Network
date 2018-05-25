@@ -1,7 +1,8 @@
 import { Injectable, OnInit } from '@angular/core';
 import { channel } from '../util/channel';
 import { account } from '../util/account';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
 
 const Web3 = require('web3');
 const Web3Utils = require('web3-utils');
@@ -23,13 +24,11 @@ export class Web3Service implements OnInit {
   accounts: account[] = [];
   channels: Map<string, channel[]> = new Map();
 
-  contractEvent: any;
-
   private accountsSource = new BehaviorSubject<account[]>(this.accounts);
   private channelsSource = new BehaviorSubject<Map<string, channel[]>>(this.channels);
 
-  accs = this.accountsSource.asObservable();
-  channs = this.channelsSource.asObservable();
+  accounts$ = this.accountsSource.asObservable();
+  channels$ = this.channelsSource.asObservable();
   
   constructor() {
     this.checkAndInstantiateWeb3();
@@ -52,47 +51,6 @@ export class Web3Service implements OnInit {
 
     this.retrieveAccounts();
     this.setProviders();
-  }
-
-  updateAccountSource(account: account, modify=false) {
-    if(modify) {
-      this.accounts.forEach((item, index) => {
-        if(item == account) {
-          this.accounts[index] = account;
-          this.accountsSource.next(this.accounts);
-        }
-      });
-    } else {
-      this.accounts.push(account);
-      this.accountsSource.next(this.accounts);
-    }
-  
-  }
-
-  updateChannelsSource(account: any, channel: channel, modify = false) {
-    //console.log(channel)
-
-    if (modify) {
-
-      this.channels.get(account).forEach((item, index) => {
-        if(item.address == channel.address)
-          this.channels.get(account)[index] = channel;
-      });
-
-    } else if (!this.channels.get(account).includes(channel)) {
-      let found = false;
-
-      this.channels.get(account).forEach((item, index) => {
-        if (item.address == channel.address)
-          found = true;
-      });
-
-      if(!found)
-        this.channels.get(account).push(channel);
-    }
-    
-
-    this.channelsSource.next(this.channels);
   }
 
   updateBalance(account: account) {
@@ -144,49 +102,32 @@ export class Web3Service implements OnInit {
 
   }
 
-  newProviders() {
-    this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
-
-    // Bootstrap the abstractions for Use.
-    this.Factory.setProvider(this.web3.currentProvider);
-    this.Channel.setProvider(this.web3.currentProvider);
-  }
-
-  channelProcessedEvent(self, from, to) {
+  channelProcessedEvent(self, from) {
     this.Factory.deployed()
       .then((instance) => {
 
-        this.contractEvent = instance.channelProcessed({ FarEnd: self }, { fromBlock: 0})
+        let ev = instance.channelProcessed({ FarEnd: self }, { fromBlock: from})
         
-        this.contractEvent.watch((err, res) => {
+        ev.watch((err, res) => {
           if (err != null) {
             alert('There was an error getting event for account X');
             return;
           }
 
-          //for(let chan of res) {
-            let tmp = new channel(
-              res.args.ContractAddrs,
-              res.args.NearEnd,
-              res.args.FarEnd,
-              this.web3.utils.fromWei(res.args.channelVal.toString()),
-              res.args.endDate,
-              this.web3.utils.fromWei(res.args.channelVal.toString()),
-              0
-            )
+          console.log("-> New channel event catched")
 
+          let tmp = new channel(
+            res.args.ContractAddrs,
+            res.args.NearEnd,
+            res.args.FarEnd,
+            this.web3.utils.fromWei(res.args.channelVal.toString()),
+            res.args.endDate,
+            this.web3.utils.fromWei(res.args.channelVal.toString()),
+            0
+          )
 
-            this.updateChannelsSource(self, tmp);
-            //let evt = this.channelAcceptedEvent(self, tmp, 0, to);
-        
-          //}
+          this.updateChannelsSource(self, tmp);
 
-          /*this.updateStateEvent(tmp, res.blockNumber, to);
-          this.disputeStateEvent(tmp, res.blockNumber, to);
-          this.randomShowedEvent(tmp, res.blockNumber, to);
-          this.channelCloseRequestEvent(tmp, res.blockNumber, to);
-          this.channelCloseEvent(tmp, res.blockNumber, to);*/
-          
         });
 
       });
@@ -207,9 +148,8 @@ export class Web3Service implements OnInit {
   channelAcceptedEvent(self, channel, from, to): any {
 
     let instance = this.Channel.at(channel.address);
-    console.log("Fuck it ! ", from, ' ! ', to, ' ! ', channel, ' ! ', self);
 
-    let evt = instance.channelAccepted({}, { fromBlock: 0 })
+    let evt = instance.channelAccepted({}, { fromBlock: 0 });
     
     evt.watch((error, result) => {
       if (error != null) {
@@ -217,9 +157,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      console.log("-> Not limiter watch", result);
-
-      //console.log("Result watch: ", result, from, to, channel.address);
+      console.log("-> Accept event catched");
       
       channel.value = this.web3.utils.fromWei(result.args.totalValue.toString());
       channel.accepted = true;
@@ -229,7 +167,6 @@ export class Web3Service implements OnInit {
 
       this.updateChannelsSource(self, channel, true);
       
-      //ev.stopWatching();
     });
 
     return evt;
@@ -264,7 +201,9 @@ export class Web3Service implements OnInit {
   updateStateEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    instance.stateUpdated( {fromBlock:0}).watch((err, res) => {
+    let ev  = instance.stateUpdated({}, {fromBlock:0});
+    
+    ev.watch((err, res) => {
       if(err != null) {
         alert('There was an error getting event update state from channel ' + channel.address);
         return;
@@ -282,7 +221,9 @@ export class Web3Service implements OnInit {
   randomShowedEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    instance.rsShownAndUsed( {fromBlock:0} ).watch((err, res) => {
+    let ev = instance.rsShownAndUsed({} ,{fromBlock:0} )
+    
+    ev.watch((err, res) => {
       if (err != null) {
         alert('There was an error getting event random showed from channel ' + channel.address);
         return;
@@ -322,7 +263,9 @@ export class Web3Service implements OnInit {
   disputeStateEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    instance.disputeAccepted({fromBlock:0}).watch((error, result) => {
+    let ev = instance.disputeAccepted({}, {fromBlock:0})
+    
+    ev.watch((error, result) => {
       if (error != null) {
         alert('There was an error getting event dispute state from channel ' + channel.address);
         return;
@@ -349,7 +292,9 @@ export class Web3Service implements OnInit {
   channelCloseRequestEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    instance.closeRequest({fromBlock:0}).watch((err, res) => {
+    let ev = instance.closeRequest({}, {fromBlock:0})
+    
+    ev.watch((err, res) => {
       if (err != null) {
         alert('There was an error getting event close request from channel ' + channel.address);
         return;
@@ -375,7 +320,9 @@ export class Web3Service implements OnInit {
   channelCloseEvent(channel: channel, from, to) {
     let instance = this.Channel.at(channel.address);
 
-    let ev = instance.channelClosed({fromBlock:0}).watch((err, res) => {
+    let ev = instance.channelClosed({}, {fromBlock:0})
+    
+    ev.watch((err, res) => {
       if (err != null) {
         alert('There was an error getting event close from channel ' + channel.address);
         return;
@@ -391,6 +338,50 @@ export class Web3Service implements OnInit {
     });
 
   }
+
+  //Update behavior subjects
+
+  updateAccountSource(account: account, modify = false) {
+    if (modify) {
+      this.accounts.forEach((item, index) => {
+        if (item == account) {
+          this.accounts[index] = account;
+          this.accountsSource.next(this.accounts);
+        }
+      });
+    } else {
+      this.accounts.push(account);
+      this.accountsSource.next(this.accounts);
+    }
+
+  }
+
+  updateChannelsSource(account: any, channel: channel, modify = false) {
+
+    if (modify) {
+
+      this.channels.get(account).forEach((item, index) => {
+        if (item.address == channel.address)
+          this.channels.get(account)[index] = channel;
+      });
+
+    } else if (!this.channels.get(account).includes(channel)) {
+      let found = false;
+
+      this.channels.get(account).forEach((item, index) => {
+        if (item.address == channel.address)
+          found = true;
+      });
+
+      if (!found)
+        this.channels.get(account).push(channel);
+    }
+
+
+    this.channelsSource.next(this.channels);
+  }
+
+  //Utils
 
   sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
