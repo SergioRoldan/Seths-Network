@@ -12,8 +12,9 @@ const routes: Routes = [
   { path: 'accounts/:account', 
     component: AccountComponent,
     children: [
-      {path: '', component: ChannelsComponent},
-      {path: 'channels', component: ChannelDetailsComponent}
+      { path: 'channels', redirectTo: ''},
+      { path: '', component: ChannelsComponent},
+      { path: 'channels/:channel', component: ChannelDetailsComponent}
     ]
   }
 ]

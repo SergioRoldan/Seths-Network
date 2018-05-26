@@ -145,11 +145,11 @@ export class Web3Service implements OnInit {
       
   }
 
-  channelAcceptedEvent(self, channel, from, to): any {
+  channelAcceptedEvent(self, channel, from): any {
 
     let instance = this.Channel.at(channel.address);
 
-    let evt = instance.channelAccepted({}, { fromBlock: 0 });
+    let evt = instance.channelAccepted({}, { fromBlock: from });
     
     evt.watch((error, result) => {
       if (error != null) {
@@ -344,7 +344,7 @@ export class Web3Service implements OnInit {
   updateAccountSource(account: account, modify = false) {
     if (modify) {
       this.accounts.forEach((item, index) => {
-        if (item == account) {
+        if (item.address == account.address) {
           this.accounts[index] = account;
           this.accountsSource.next(this.accounts);
         }

@@ -1,0 +1,8 @@
+p {
+    border-bottom: 1px solid #ddd;
+}
+
+.center {
+  margin-top: 20px;
+  margin: 0 auto;
+}

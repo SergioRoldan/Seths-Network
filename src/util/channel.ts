@@ -18,7 +18,7 @@ export class channel {
     randoms: any[];
     hashes: any[];
 
-    constructor(address, nearEnd, farEnd, value, endDate, farEndValue, nearEndValue, accepted = false, id = 0, closed = false) {
+    constructor(address, nearEnd, farEnd, value, endDate, nearEndValue, farEndValue, accepted = false, id = 0, closed = false) {
         this.address = address;
         this.nearEnd = nearEnd;
         this.farEnd = farEnd;

@@ -11,12 +11,8 @@ import {account} from '../util/account';
 })
 export class AppComponent {
 
-  accounts: account[] = [];  
-  channels: channel[] = [];
 
-  /*mainAddress = "0xf17f52151EbEF6C7334FAD080c5704D77216b732";
-
-  createAmount: number;
+  /*createAmount: number;
   recipientAddress: string;
   daysOpen: number;
 
@@ -42,50 +38,37 @@ export class AppComponent {
 
       if(accounts.length != lastLength && accounts.length > 0) {
         this.web3Service.channelProcessedEvent(accounts[lastLength].address, 0);
+        this.updateChannels(accounts[lastLength].address);
         lastLength = accounts.length;
-        console.log(lastLength); 
+        console.log('New address fired!'); 
       }
-          
-      console.log('Address update fired! ', accounts);
         
     });
   }
 
-  /*updateChannels(address) {
+  updateChannels(address) {
     let lastLenght = 0;
+
     this.web3Service.channels$.subscribe(channels => {
-      if(channels.size > 0) {
-        if(channels.get(address).length != lastLenght) {
-          this.retrieveAccept(channels.get(address)[lastLenght]);
+
+      if (channels.size > 0 && channels.get(address).length != lastLenght) {
+          this.listenChannelEvents(channels.get(address)[lastLenght], address);
           lastLenght = channels.get(address).length;
-        }
-        this.channels = channels.get(address);
+          console.log("New channel fired!");
       }
-      
-      console.log("Channels fired: ", channels);
+
     });
   }
+  
+  listenChannelEvents(channel: channel, address) {
+    this.web3Service.channelAcceptedEvent(address, channel, 0);
+  }
+  /*
 
   updateState() {
     //this.web3Service.getTransactions().subscribe(trans => this.transactions = trans);
   }
 
-  retrieveAccept(channel: channel, address = this.mainAddress) {
-    this.web3Service.channelAcceptedEvent(
-      address,
-      channel,
-      0,
-      'latest'
-    );
-  }
-
-  setStatus(message: string, status: string) {
-    if(status == 'create')
-      this.status_create = message;
-    else if(status == 'accept')
-      this.status_accept = message
-  }
-  
   createChannel() {
 
     const amount = this.createAmount;
@@ -107,23 +90,6 @@ export class AppComponent {
     
   }
 
-  acceptChannel() {
-    const address = this.channelAddress;
-    const value = this.acceptAmount;
-
-    this.setStatus('Initiating transaction... (please wait)', 'accept');
-    
-    this.web3Service.acceptChannel(address, this.accounts[1].address, value).then(result => {
-      if (result.receipt.status == 1) {
-        this.setStatus('Transaction complete!', 'accept');
-        this.web3Service.updateBalance(this.accounts[1]);
-      }
-      else if (result.receipt.status == 0)
-        this.setStatus('Error accepting channel, EVM state reverted.', 'accept');
-    }).catch(error => {
-      console.log("Error accepting the channel: " + error);
-    });
-  }
 
   enoughEther(amount: string): boolean {
     if (!canBeNumber(amount))

@@ -1,3 +1,59 @@
-<p>
-  channel-details works!
-</p>
+<div class="container center" *ngIf="channel != null">
+
+  <h5 class="title is-4"> Channel {{ channel.address }}</h5>
+  
+    <p>Address: {{channel.address}}</p>
+    <p>Value: {{channel.value}}</p>
+    <br>
+    <p>Near End: {{channel.nearEnd}}</p>
+    <p>Near End Value: {{channel.nearEndValue}}</p>
+    <p>Far End: {{channel.farEnd}}</p>
+    <p>Far End Value: {{channel.farEndValue}}</p>
+    <br>
+    <p>End Date: {{channel.endDate}}</p>
+    <p>Id: {{channel.id}}</p>
+    <br>
+    <p>Accepted: {{channel.accepted}}</p>
+    <p>Closed: {{channel.closed}}</p>
+    <br>
+    <p>Randoms: {{channel.randoms}}</p>
+    <p>Hashed: {{channel.hashes}}</p>
+
+    <div class="container padd" *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase()">
+    
+      <h5 class="title is-4">Accept channel</h5>
+      <h5 class="title is-5 is-info help">{{status}}</h5>
+    
+      <form #acceptForm="ngForm" class="form-inline">
+    
+        <div class="field">
+          <label class="label">Amount</label>
+          <p class="control">
+            <input [(ngModel)]="acceptAmount" name="acceptAmount" class="input" type="text" placeholder="1 Ether" required #acceptAmountModel="ngModel">
+          </p>
+          <div *ngIf="acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
+            <p [hidden]="!acceptAmountModel.errors.required">
+              This field is required
+            </p>
+          </div>
+          <div *ngIf="!acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
+            <p [hidden]="enoughEther(acceptAmount)">
+              Must have enough ether and a number
+            </p>
+          </div>
+        </div>
+    
+        <div class="field is-grouped">
+          <p class="control">
+            <button [disabled]="!acceptForm.valid" (click)="acceptChannel()" class="button is-primary">
+              Accept channel
+            </button>
+          </p>
+    
+        </div>
+      </form>
+    </div>
+
+    <button (click)="goBack()" class="button is-primary"> Go Back </button>
+      
+</div>

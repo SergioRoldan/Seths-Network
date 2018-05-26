@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Web3Service } from '../web3.service';
 import { channel } from '../../util/channel';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { account } from '../../util/account';
 
 @Component({
@@ -18,7 +18,7 @@ export class ChannelsComponent implements OnInit, OnDestroy {
 
   selectedChannel: channel;
 
-  constructor(private route: ActivatedRoute, private web3Service: Web3Service) { }
+  constructor(private route: ActivatedRoute, private web3Service: Web3Service, private router: Router) { }
 
   ngOnInit() {
     this.sub = this.route.parent.params.subscribe(params => this.account = JSON.parse(params['account']));
@@ -33,5 +33,7 @@ export class ChannelsComponent implements OnInit, OnDestroy {
 
   selectChannel(channel: channel) {
     this.selectedChannel = channel;
+    this.router.navigate(['channels', JSON.stringify(channel)], { relativeTo: this.route });
   }
+
 }
