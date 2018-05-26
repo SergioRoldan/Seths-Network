@@ -7,14 +7,17 @@ Tested in Windows 10 with Ganache
 # Requirements
 
 Nmp 5.6.0 or - (new version of node crash installing the modules, working to fix this)
+
 Truffle 4.0.0 or + (not tested with older version)
+
 Ganache, Geth, Testrpc or similar (use port 7545 or modify truffle.js file to point to another port)
 
 Clone project using: #git clone https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box.git
 
 Install modules in the root of the project using: #npm install
 
-Include/modify the next line in the following file, otherwise angular won't compile correctly: 'node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js':
+Include/modify the next line in the following file, otherwise angular won't compile correctly: 
+'node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js':
     node: {crypto:true, stream:true}
 
    - This solves Angular 6 strip of crypto and stream libraries, which are truffle-contracts library dependencies
