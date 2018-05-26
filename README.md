@@ -4,7 +4,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Tested in Windows 10 with Ganache
 
-# Requirements
+## Requirements
 
 Nmp 5.6.0 or - (new version of node crash installing the modules, working to fix this)
 
@@ -12,11 +12,14 @@ Truffle 4.0.0 or + (not tested with older version)
 
 Ganache, Geth, Testrpc or similar (use port 7545 or modify truffle.js file to point to another port)
 
+## Installation
+
 Clone project using: #git clone https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box.git
 
 Install modules in the root of the project using: #npm install
 
-Include/modify the next line in the following file, otherwise angular won't compile correctly: 
+Include/modify the next line in the following file, otherwise angular won't compile correctly:
+
 'node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js':
     node: {crypto:true, stream:true}
 
@@ -31,7 +34,7 @@ In root dir of the project:
 - I. To start the client: #npm run electron-build
 - II. Alternative to start the client use "#ng serve", point index.html to localhost:4200 (currently pointing to "./") and then "#npm run electron"
 
-// On development //
+## On Development
 
 You will see the address of your node, click on any of them to see its contracts (empty if any has been created) or to create a new one. Click on a contract to interact with it.
 
