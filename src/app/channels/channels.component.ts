@@ -36,4 +36,11 @@ export class ChannelsComponent implements OnInit, OnDestroy {
     this.router.navigate(['channels', JSON.stringify(channel)], { relativeTo: this.route });
   }
 
+  goCreate() {
+    this.router.navigate(['ethereum', JSON.stringify({
+      'operation': 'create',
+      'channel': ''
+    })], {relativeTo: this.route});
+  }
+
 }

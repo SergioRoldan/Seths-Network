@@ -1,0 +1,154 @@
+<div class="container center" *ngIf="operation == 'create'">
+
+  <h5 class="title is-4">Create channel</h5>
+  <h5 class="title is-5 is-info help">{{status_create}}</h5>
+
+  <form #channelForm="ngForm">
+
+    <div class="field">
+      <label class="label">Amount</label>
+      <p class="control">
+        <input [(ngModel)]="createAmount" class="input" type="text" placeholder="1 Ether" name="createAmount" required #createAmountModel="ngModel">
+      </p>
+      <div *ngIf="createAmountModel.errors && (createAmountModel.dirty || createAmountModel.touched)" class="help is-danger">
+        <p [hidden]="!createAmountModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!createAmountModel.errors && (createAmountModel.dirty || createAmountModel.touched)" class="help is-danger">
+        <p [hidden]="enoughEther(createAmount)">
+          Must have enough ether and a number
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Destinatary</label>
+      <p class="control">
+        <input [(ngModel)]="recipientAddress" name="recipientAddress" class="input" type="text" placeholder="0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
+          required #recipientAddressModel="ngModel">
+      </p>
+      <div *ngIf="recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)" class="help is-danger">
+        <p [hidden]="!recipientAddressModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)" class="help is-danger">
+        <p [hidden]="canBeAddress(recipientAddress)">
+          Must be address format
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Days open</label>
+      <p class="control">
+        <input [(ngModel)]="daysOpen" name="daysOpen" class="input" type="text" placeholder="30 days" required #daysOpenModel="ngModel">
+      </p>
+      <div *ngIf="daysOpenModel.errors && (daysOpenModel.dirty || daysOpenModel.touched)" class="help is-danger">
+        <p [hidden]="!daysOpenModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!daysOpenModel.errors && (daysOpenModel.dirty || daysOpenModel.touched)" class="help is-danger">
+        <p [hidden]="canBeDays(daysOpen)">
+          Must be in days format
+        </p>
+      </div>
+    </div>
+
+    <div class="field is-grouped">
+      <p class="control">
+        <button [disabled]="!channelForm.valid" (click)="createChannel()" class="button is-primary">
+          Create channel
+        </button>
+      </p>
+    </div>
+
+  </form>
+
+</div>
+
+<div class="container center" *ngIf="operation == 'update' && channel != null">
+
+  <h5 class="title is-4">Update channel</h5>
+  <h5 class="title is-5 is-info help">{{status_update}}</h5>
+
+  <form #updateForm="ngForm">
+
+    <div class="field">
+      <label class="label">Sender</label>
+      <p class="control">
+        <input [(ngModel)]="updateSender" class="input" type="text" placeholder="0x..." name="updateSender" required #updateSenderModel="ngModel">
+      </p>
+      <div *ngIf="updateSenderModel.errors && (updateSenderModel.dirty || updateSenderModel.touched)" class="help is-danger">
+        <p [hidden]="!updateSenderModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!updateSenderModel.errors && (updateSenderModel.dirty ||updateSenderModel.touched)" class="help is-danger">
+        <p [hidden]="canBeAddress(updateSender)">
+          Must be address format
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Amount</label>
+      <p class="control">
+        <input [(ngModel)]="updateAmount" class="input" type="text" placeholder="1 Ether" name="updateAmount" required #updateAmountModel="ngModel">
+      </p>
+      <div *ngIf="updateAmountModel.errors && (updateAmountModel.dirty || updateAmountModel.touched)" class="help is-danger">
+        <p [hidden]="!updateAmountModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!updateAmountModel.errors && (updateAmountModel.dirty ||updateAmountModel.touched)" class="help is-danger">
+        <p [hidden]="enoughEtherChannel(updateAmount)">
+          Must have enough ether and a number
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Id</label>
+      <p class="control">
+        <input [(ngModel)]="updateId" class="input" type="text" placeholder="52" name="updateId" required #updateIdModel="ngModel">
+      </p>
+      <div *ngIf="updateIdModel.errors && (updateIdModel.dirty || updateIdModel.touched)" class="help is-danger">
+        <p [hidden]="!updateIdModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!updateIdModel.errors && (updateIdModel.dirty ||updateIdModel.touched)" class="help is-danger">
+        <p [hidden]="canBeNumber(updateId)">
+          Must be number
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Signature</label>
+      <p class="control">
+        <input [(ngModel)]="updateSignature" class="input" type="text" placeholder="(Optional) If omitted will be generated" name="updateSignature" required #updateSignatureModel="ngModel">
+      </p>
+      <div *ngIf="!updateSignatureModel.errors && (updateSignatureModel.dirty ||updateSignatureModel.touched)" class="help is-warning">
+        <p [hidden]="canBeSignature(updateSignature)">
+          Signature not provided or not in signature format 
+        </p>
+      </div>
+    </div>
+
+    <div class="field is-grouped">
+      <p class="control">
+        <button (click)="updateChannel()" class="button is-primary">
+          Update channel
+        </button>
+      </p>
+    </div>
+
+
+  </form>
+</div>
+
+<button (click)="goBack()" class="button is-primary"> Go Back </button>

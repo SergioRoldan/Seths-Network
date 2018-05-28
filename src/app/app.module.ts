@@ -9,6 +9,8 @@ import { AppRoutingModule } from './/app-routing.module';
 import { MainComponent } from './main/main.component';
 import { AccountComponent } from './account/account.component';
 import { ChannelsComponent } from './channels/channels.component';
+import { OperationComponent } from './operation/operation.component';
+import { LightningComponent } from './lightning/lightning.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +18,9 @@ import { ChannelsComponent } from './channels/channels.component';
     ChannelDetailsComponent,
     MainComponent,
     AccountComponent,
-    ChannelsComponent
+    ChannelsComponent,
+    OperationComponent,
+    LightningComponent
   ],
   imports: [
     BrowserModule,

@@ -19,7 +19,7 @@
     <p>Randoms: {{channel.randoms}}</p>
     <p>Hashed: {{channel.hashes}}</p>
 
-    <div class="container padd" *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase()">
+    <div class="container padd" *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && !channel.accepted">
     
       <h5 class="title is-4">Accept channel</h5>
       <h5 class="title is-5 is-info help">{{status}}</h5>
@@ -43,7 +43,7 @@
           </div>
         </div>
     
-        <div class="field is-grouped">
+        <div class="field is-grouped right">
           <p class="control">
             <button [disabled]="!acceptForm.valid" (click)="acceptChannel()" class="button is-primary">
               Accept channel
@@ -54,6 +54,7 @@
       </form>
     </div>
 
+    <button (click)="goUpdate()" class="button is-primary"> Upload update </button>
     <button (click)="goBack()" class="button is-primary"> Go Back </button>
       
 </div>

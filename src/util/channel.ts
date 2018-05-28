@@ -8,6 +8,8 @@ export class channel {
     value: any;
     endDate: any;
 
+    web3Utils: any = Web3Utils;
+
     accepted: any;
     closed: any;
 
@@ -54,7 +56,7 @@ export class channel {
     }
 
     checkRandomHashesInH(random: any) {
-        let h = Web3Utils.soliditySha3(
+        let h = this.web3Utils.soliditySha3(
             { t: 'bytes32', v: random}
         );
 

@@ -5,6 +5,8 @@ import { MainComponent} from './main/main.component';
 import { AccountComponent } from './account/account.component';
 import { ChannelDetailsComponent } from './channel-details/channel-details.component';
 import { ChannelsComponent } from './channels/channels.component';
+import { OperationComponent } from './operation/operation.component';
+import { LightningComponent } from './lightning/lightning.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/main', pathMatch: 'full' },
@@ -14,6 +16,8 @@ const routes: Routes = [
     children: [
       { path: 'channels', redirectTo: ''},
       { path: '', component: ChannelsComponent},
+      { path: 'ethereum/:options', component: OperationComponent},
+      { path: 'lightning/:options', component: LightningComponent},
       { path: 'channels/:channel', component: ChannelDetailsComponent}
     ]
   }

@@ -3,6 +3,7 @@ import { channel } from '../util/channel';
 import { account } from '../util/account';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
+import { updateParams } from '../util/updateParams';
 
 const Web3 = require('web3');
 const Web3Utils = require('web3-utils');
@@ -17,6 +18,7 @@ const channelArtifacts = require('../../build/contracts/ChannelFinal.json');
 export class Web3Service implements OnInit {
 
   web3: any;
+  web3Utils: any = Web3Utils;
 
   Factory = contract(factoryArtifacts);
   Channel = contract(channelArtifacts);
@@ -163,8 +165,6 @@ export class Web3Service implements OnInit {
       channel.accepted = true;
       channel.farEndValue = this.web3.utils.fromWei(result.args.farEndValue.toString());
 
-      console.log("Channel accepted");
-
       this.updateChannelsSource(self, channel, true);
       
     });
@@ -183,14 +183,14 @@ export class Web3Service implements OnInit {
     });
   }
 
-  async updateState(contract, self, updateParameters): Promise<any> {
+  async updateState(contract, self, updateParameters: updateParams): Promise<any> {
     let instance = await this.Channel.at(contract);
 
     return instance.updateState(
       updateParameters.end_chann, updateParameters.values_id,
       updateParameters.v, updateParameters.r_s,
       updateParameters.rsSigned, updateParameters.rs, updateParameters.hs,
-      updateParameters.ttls, updateParameters.rhVals, updateParameters.end,
+      updateParameters.ttls, updateParameters.rhVals, updateParameters.ends,
       {
         from: self,
         gas: 3000000
@@ -198,10 +198,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  updateStateEvent(channel: channel, from, to) {
+  updateStateEvent(self, channel, from): any {
     let instance = this.Channel.at(channel.address);
 
-    let ev  = instance.stateUpdated({}, {fromBlock:0});
+    let ev  = instance.stateUpdated({}, {fromBlock: from});
     
     ev.watch((err, res) => {
       if(err != null) {
@@ -209,12 +209,16 @@ export class Web3Service implements OnInit {
         return;
       }
 
+      console.log("-> Update event catched");
+
       channel.id = res.args.currentId;
       channel.nearEndValue = res.args.nearEndValue;
       channel.farEndValue = res.args.farEndValue;
 
-      console.log("Channel state updated");
+      this.updateChannelsSource(self, channel, true);
     });
+
+    return ev;
 
   }
 
@@ -386,4 +390,5 @@ export class Web3Service implements OnInit {
   sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
   }
+
 }

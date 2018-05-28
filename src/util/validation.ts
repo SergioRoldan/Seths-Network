@@ -12,6 +12,13 @@ export function canBeAddress(str: string): boolean {
   return str.length == 42;
 }
 
+export function canBeSignature(str: string): boolean{
+  if(!canBeNumber)
+    return false;
+
+  return str.length == 132;
+}
+
 export function canBeDays(str: string): boolean {
   if (!canBeNumber)
     return false;

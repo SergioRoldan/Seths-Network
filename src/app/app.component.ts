@@ -12,19 +12,6 @@ import {account} from '../util/account';
 export class AppComponent {
 
 
-  /*createAmount: number;
-  recipientAddress: string;
-  daysOpen: number;
-
-  channelAddress: string;
-  acceptAmount: number;
-
-  status_create: string;
-  status_accept: string;
-
-  canBeAddress = canBeAddress;
-  canBeDays = canBeDays;*/
-
   constructor(private web3Service: Web3Service) {}
 
   ngOnInit() {
@@ -62,47 +49,7 @@ export class AppComponent {
   
   listenChannelEvents(channel: channel, address) {
     this.web3Service.channelAcceptedEvent(address, channel, 0);
-  }
-  /*
-
-  updateState() {
-    //this.web3Service.getTransactions().subscribe(trans => this.transactions = trans);
+    this.web3Service.updateStateEvent(address, channel, 0);
   }
 
-  createChannel() {
-
-    const amount = this.createAmount;
-    const receiver = this.recipientAddress;
-    const days = this.daysOpen;
-
-    this.setStatus('Initiating transaction... (please wait)', 'create');
-
-    this.web3Service.createNewChannel(this.accounts[0].address, receiver, amount, days).then(result => {
-      if (result.receipt.status == 1) {
-        this.setStatus('Transaction complete!', 'create');
-        this.web3Service.updateBalance(this.accounts[0]);
-      }
-      else if (result.receipt.status == 0)
-        this.setStatus('Error creating channel, EVM state reverted', 'create');
-    }).catch(error => {
-      console.log("Error creating the channel: "+error);
-    });
-    
-  }
-
-
-  enoughEther(amount: string): boolean {
-    if (!canBeNumber(amount))
-      return false;
-
-    if (+amount < 0 || +amount > (100000000000000000000))
-      return false;
-
-    return true;
-  }*/
 }
-
-/*export interface Accounts {
-  address: any;
-  balance: any;
-}*/
