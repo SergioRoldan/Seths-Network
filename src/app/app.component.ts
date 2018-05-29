@@ -50,6 +50,9 @@ export class AppComponent {
   listenChannelEvents(channel: channel, address) {
     this.web3Service.channelAcceptedEvent(address, channel, 0);
     this.web3Service.updateStateEvent(address, channel, 0);
+    this.web3Service.disputeStateEvent(address, channel, 0);
+    this.web3Service.channelCloseRequestEvent(address, channel, 0);
+    this.web3Service.channelCloseEvent(address, channel, 0);
   }
 
 }

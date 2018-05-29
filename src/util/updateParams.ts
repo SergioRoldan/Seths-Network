@@ -24,7 +24,9 @@ export class updateParams {
         this.web3 = web3;
         
         this.end_chann = [end, chann];
-        this.values_id = [values, id];
+        this.values_id = [this.web3.utils.toWei(values, 'ether'), id];
+
+        console.log(this.values_id);
 
         this.rsSigned = rsSigned;
         this.rs = rs;
@@ -33,13 +35,21 @@ export class updateParams {
         this.rhVals = rhVals;
         this.ends = ends;
         
-        if(signature == null || signature == '') 
-            signature = this.generateSignature();
+        if(signature == null || signature == '') {
+            this.generateSignature().then(res => {
+                signature = res
 
-        let tmp = this.parseSignature(signature);
+                let tmp = this.parseSignature(signature);
 
-        this.v = tmp['v'];
-        this.r_s = [tmp['r'], tmp['s']];
+                this.v = tmp['v'];
+                this.r_s = [tmp['r'], tmp['s']];
+             });
+        } else {
+            let tmp = this.parseSignature(signature);
+
+            this.v = tmp['v'];
+            this.r_s = [tmp['r'], tmp['s']];
+        }
 
     }
 
@@ -57,14 +67,14 @@ export class updateParams {
         }
     }
 
-    parseSignature(signature: string): any {
-        console.log(signature.valueOf());
+    parseSignature(signature: any): any {
+        console.log(signature);
         
         let sign = signature.substring(2);
         let r = '0x' + sign.slice(0, 64);
         let s = '0x' + sign.slice(64, 128);
         let v = '0x' + sign.slice(128, 130);
-        let v_dec = this.web3.toDecimal(v) + 27;
+        let v_dec = this.web3.utils.hexToNumber(v) + 27;
 
         return {'r': r, 's': s, 'v': v_dec};
     }

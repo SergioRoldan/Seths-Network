@@ -108,7 +108,8 @@ export class Web3Service implements OnInit {
     this.Factory.deployed()
       .then((instance) => {
 
-        let ev = instance.channelProcessed({ FarEnd: self }, { fromBlock: from})
+        // {FarEnd: self} for {}
+        let ev = instance.channelProcessed({}, { fromBlock: from})
         
         ev.watch((err, res) => {
           if (err != null) {
@@ -147,7 +148,7 @@ export class Web3Service implements OnInit {
       
   }
 
-  channelAcceptedEvent(self, channel, from): any {
+  channelAcceptedEvent(self, channel: channel, from): any {
 
     let instance = this.Channel.at(channel.address);
 
@@ -212,8 +213,15 @@ export class Web3Service implements OnInit {
       console.log("-> Update event catched");
 
       channel.id = res.args.currentId;
-      channel.nearEndValue = res.args.nearEndValue;
-      channel.farEndValue = res.args.farEndValue;
+
+      if(res.args.sender.toLowerCase() == channel.nearEnd.toLowerCase()) {
+        channel.nearEndValue = this.web3.utils.fromWei(res.args.senderValue.toString());
+        channel.farEndValue = this.web3.utils.fromWei(res.args.uploaderValue.toString());
+      } else if(res.args.sender.toLowerCase() == channel.farEnd.toLowerCase()) {
+        channel.nearEndValue = this.web3.utils.fromWei(res.args.uploaderValue.toString());
+        channel.farEndValue = this.web3.utils.fromWei(res.args.senderValue.toString());
+      }
+      
 
       this.updateChannelsSource(self, channel, true);
     });
@@ -256,7 +264,7 @@ export class Web3Service implements OnInit {
       disputeParameters.end_chann, disputeParameters.values_id,
       disputeParameters.v, disputeParameters.r_s,
       disputeParameters.rsSigned, disputeParameters.rs, disputeParameters.hs,
-      disputeParameters.ttls, disputeParameters.rhVals, disputeParameters.end,
+      disputeParameters.ttls, disputeParameters.rhVals, disputeParameters.ends,
       {
         from: self,
         gas: 3000000
@@ -264,19 +272,24 @@ export class Web3Service implements OnInit {
     );
   }
 
-  disputeStateEvent(channel: channel, from, to) {
+  disputeStateEvent(self, channel: channel, from) {
+
     let instance = this.Channel.at(channel.address);
 
-    let ev = instance.disputeAccepted({}, {fromBlock:0})
+    let ev = instance.disputeAccepted({}, {fromBlock: from})
     
     ev.watch((error, result) => {
       if (error != null) {
         alert('There was an error getting event dispute state from channel ' + channel.address);
         return;
       }
-      console.log("Dispute from "+ result.args.end + " accepted with id " + result.args.currentId);
       
-      return;
+      console.log("-> Dispute event catched");
+
+      channel.id = result.args.currentId;
+
+      this.updateChannelsSource(self, channel, true);
+
     });
 
   }
@@ -293,10 +306,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  channelCloseRequestEvent(channel: channel, from, to) {
+  channelCloseRequestEvent(self, channel: channel, from) {
     let instance = this.Channel.at(channel.address);
 
-    let ev = instance.closeRequest({}, {fromBlock:0})
+    let ev = instance.closeRequest({}, {fromBlock: from})
     
     ev.watch((err, res) => {
       if (err != null) {
@@ -304,7 +317,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      console.log("Close request from " + res.args.end + " changed to " + res.args.closeChange);
+      console.log("Close request from " + res.args.end + " catched: " + res.args.closeChange);
 
     });
 
@@ -321,10 +334,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  channelCloseEvent(channel: channel, from, to) {
+  channelCloseEvent(self, channel: channel, from) {
     let instance = this.Channel.at(channel.address);
 
-    let ev = instance.channelClosed({}, {fromBlock:0})
+    let ev = instance.channelClosed({}, {fromBlock: from})
     
     ev.watch((err, res) => {
       if (err != null) {
@@ -333,17 +346,16 @@ export class Web3Service implements OnInit {
       }
 
       channel.setClosed();
-      channel.nearEndValue = res.args.nearEndFinalValue;
-      channel.farEndValue = res.args.farEndFinalValue;
+      channel.nearEndValue = this.web3.utils.fromWei(res.args.nearEndFinalValue.toString());
+      channel.farEndValue = this.web3.utils.fromWei(res.args.farEndFinalValue.toString());
       channel.id = res.args.finalId;
 
-      console.log("Channel closed");
-      ev.stopWatching();
+      console.log("-> Close event catched", channel);
+
+      this.updateChannelsSource(self, channel, true);
     });
 
   }
-
-  //Update behavior subjects
 
   updateAccountSource(account: account, modify = false) {
     if (modify) {

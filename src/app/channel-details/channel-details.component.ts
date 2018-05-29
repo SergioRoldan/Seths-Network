@@ -21,8 +21,13 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
   acceptAmount: number;
 
   status: string;
+  status_more: string;
 
-  constructor(private route: ActivatedRoute, private web3Service: Web3Service, private router: Router) { }
+  now: any;
+
+  constructor(private route: ActivatedRoute, private web3Service: Web3Service, private router: Router) {
+    this.now = Date.now();
+   }
 
   ngOnInit() {
     this.subAcc = this.route.parent.params.subscribe(params => this.account = JSON.parse(params['account']));
@@ -32,6 +37,8 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
         if(chann.address == this.channel.address) 
           this.channel = chann;
     });
+    if (this.channel.endDate.getTime() < this.now)
+      this.web3Service.sleep(this.now - this.channel.endDate.getTime()).then(() => this.now = Date.now());
   }
 
   goBack() {
@@ -45,9 +52,16 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
     })], { relativeTo: this.route });
   }
 
+  goDispute() {
+    this.router.navigate(['../../ethereum', JSON.stringify({
+      'operation': 'dispute',
+      'channel': this.channel
+    })], {relativeTo: this.route});
+  }
+
   acceptChannel() {
     const value = this.acceptAmount;
-
+    
     this.setStatus('Initiating transaction... (please wait)');
 
     this.web3Service.acceptChannel(this.channel.address, this.account.address, value).then(result => {
@@ -63,8 +77,35 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  setStatus(message: string) {
+  closeChannel() {
+    this.web3Service.closeChannel(this.channel.address, this.account.address, true).then(result => {
+      if (result.receipt.status == 1) {
+        this.setStatus('Transaction complete!', 'more');
+        this.web3Service.updateBalance(this.account);
+      } else if(result.receipt.status == 0) 
+        this.setStatus('Error closing the channel, EVM state reverted.', 'more');
+    }).catch(error => {
+      console.log("Error closing the channel: " + error);
+    });
+  }
+
+  unlockFunds() {
+    this.web3Service.unlockFunds(this.channel.address, this.account.address).then(result => {
+      if (result.receipt.status == 1) {
+        this.setStatus('Transaction complete!', 'more');
+        this.channel.closed = true;
+        this.web3Service.updateBalance(this.account);
+      } else if (result.receipt.status == 0)
+        this.setStatus('Error unlocking the channel, EVM state reverted.', 'more');
+    }).catch(error => {
+      console.log("Error unlocking the channel: " + error);
+    });
+  }
+
+  setStatus(message: string, more?: string) {
     this.status = message;
+    if(more && more == 'more')
+      this.status_more = message;
   }
 
   enoughEther(amount: string): boolean {

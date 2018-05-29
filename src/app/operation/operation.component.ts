@@ -31,6 +31,8 @@ export class OperationComponent implements OnInit, OnDestroy {
   updateSignature: string;
   status_update: string;
 
+  status_dispute: string;
+
   canBeAddress = canBeAddress;
   canBeDays = canBeDays;
   canBeNumber = canBeNumber;
@@ -78,6 +80,7 @@ export class OperationComponent implements OnInit, OnDestroy {
   }
 
   updateChannel() {
+    this.setStatus('Initiating transaction... (please wait)', 'update');
 
     const send = this.updateAmount;
     const sender = this.updateSender;
@@ -86,15 +89,14 @@ export class OperationComponent implements OnInit, OnDestroy {
     const chann = this.channel.address;
     let amount = 0;
 
-    if(sender == this.channel.farEnd)
+    if(sender.toLowerCase() == this.channel.farEnd.toLowerCase())
       amount = this.channel.farEndValue - send;
-    else if(sender == this.channel.nearEnd)
+    else if(sender.toLocaleLowerCase() == this.channel.nearEnd.toLowerCase())
       amount = this.channel.nearEndValue - send;
 
     if(amount > 0) {
-      let params = new updateParams(this.web3Service.web3, sender, chann, send, id, signature);
 
-      console.log(params);
+      let params = new updateParams(this.web3Service.web3, sender, chann, send, id, signature);
 
       this.web3Service.updateState(this.channel.address, this.account.address, params).then(result => {
         if (result.receipt.status == 1) {
@@ -110,11 +112,46 @@ export class OperationComponent implements OnInit, OnDestroy {
 
   }
 
+  disputeState() {
+    this.setStatus('Initiating transaction... (please wait)', 'dispute');
+
+    const send = this.updateAmount;
+    const sender = this.updateSender;
+    const id = this.updateId;
+    const signature = this.updateSignature || '';
+    const chann = this.channel.address;
+    let amount = 0;
+
+    if (sender.toLowerCase() == this.channel.farEnd.toLowerCase())
+      amount = this.channel.farEndValue - send;
+    else if (sender.toLocaleLowerCase() == this.channel.nearEnd.toLowerCase())
+      amount = this.channel.nearEndValue - send;
+
+    if (amount > 0) {
+
+      let params = new updateParams(this.web3Service.web3, sender, chann, send, id, signature);
+
+      this.web3Service.disputeState(this.channel.address, this.account.address, params).then(result => {
+        if (result.receipt.status == 1) {
+          this.setStatus('Transaction complete!', 'dispute');
+          this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], { relativeTo: this.route }))
+        }
+        else if (result.receipt.status == 0)
+          this.setStatus('Error disputing state, EVM state reverted', 'dispute');
+      }).catch(error => {
+        console.log("Error disputing state: " + error);
+      });
+    }
+
+  }
+
   setStatus(message: string, operation: string) {
     if(operation == 'create')
       this.status_create = message;
     else if(operation = 'update')
       this.status_update = message;
+    else if(operation = 'dispute')
+      this.status_dispute = message;
   }
 
   goBack() {

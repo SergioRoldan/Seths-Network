@@ -104,8 +104,8 @@ contract Modifiers {
 
 contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
-    event stateUpdated(address indexed NearEnd, uint256 nearEndValue, address indexed FarEnd,
-    uint256 farEndValue, uint256 currentId);
+    event stateUpdated(address indexed sender, uint256 senderValue, address indexed uploader,
+    uint256 uploaderValue, uint256 currentId);
 
     event disputeAccepted(address indexed end, uint256 currentId);
 
