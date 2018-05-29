@@ -61,7 +61,7 @@ export class Web3Service implements OnInit {
         alert('There was an error fetching balance of account ' + account.address + ': ' + err);
         return;
       }
-      account.balance = val;
+      account.balance = this.web3.utils.fromWei(val.toString());
       this.updateAccountSource(account, true);
     });
   }
@@ -84,7 +84,7 @@ export class Web3Service implements OnInit {
             alert('There was an error fetching balance of account ' + acc + ': ' + err);
             return;
           }
-          let tmp = new account(acc, this.web3.utils.fromWei(val));
+          let tmp = new account(acc, this.web3.utils.fromWei(val.toString()));
           this.channels.set(acc, [])
           this.updateAccountSource(tmp);
         });
@@ -104,12 +104,11 @@ export class Web3Service implements OnInit {
 
   }
 
-  channelProcessedEvent(self, from) {
+  channelProcessedEventFar(self, from) {
     this.Factory.deployed()
       .then((instance) => {
-
-        // {FarEnd: self} for {}
-        let ev = instance.channelProcessed({}, { fromBlock: from})
+        
+        let ev = instance.channelProcessed({ FarEnd: self }, { fromBlock: from});
         
         ev.watch((err, res) => {
           if (err != null) {
@@ -117,7 +116,38 @@ export class Web3Service implements OnInit {
             return;
           }
 
-          console.log("-> New channel event catched")
+          console.log("-> New channel far event catched", self)
+
+          let tmp = new channel(
+            res.args.ContractAddrs,
+            res.args.NearEnd,
+            res.args.FarEnd,
+            this.web3.utils.fromWei(res.args.channelVal.toString()),
+            res.args.endDate,
+            this.web3.utils.fromWei(res.args.channelVal.toString()),
+            0
+          )
+
+          this.updateChannelsSource(self, tmp);
+
+        });
+
+      });
+  }
+
+  channelProcessedEventNear(self, from) {
+    this.Factory.deployed()
+      .then((instance) => {
+
+        let ev2 = instance.channelProcessed({ NearEnd: self }, { fromBlock: from });
+
+        ev2.watch((err, res) => {
+          if (err != null) {
+            alert('There was an error getting event for account X');
+            return;
+          }
+
+          console.log("-> New channel near event catched", self)
 
           let tmp = new channel(
             res.args.ContractAddrs,
@@ -199,7 +229,7 @@ export class Web3Service implements OnInit {
     );
   }
 
-  updateStateEvent(self, channel, from): any {
+  updateStateEvent(self, channel: channel, from): any {
     let instance = this.Channel.at(channel.address);
 
     let ev  = instance.stateUpdated({}, {fromBlock: from});
@@ -230,10 +260,10 @@ export class Web3Service implements OnInit {
 
   }
 
-  randomShowedEvent(channel: channel, from, to) {
+  randomShowedEvent(self, channel: channel, from) {
     let instance = this.Channel.at(channel.address);
 
-    let ev = instance.rsShownAndUsed({} ,{fromBlock:0} )
+    let ev = instance.rsShownAndUsed({} ,{fromBlock: from} )
     
     ev.watch((err, res) => {
       if (err != null) {
@@ -254,6 +284,8 @@ export class Web3Service implements OnInit {
           console.log("Random showed");
         }
       }
+
+      this.updateChannelsSource(self, channel, true);
     });
   }
 

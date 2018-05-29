@@ -28,16 +28,18 @@ export class AppComponent {
     
     this.web3Service.accounts$.subscribe(accounts => {
 
-      this.mutex.acquire().then(function (release) {
+      this.mutex.acquire().then(release => {
         if (accounts.length != lastLength && accounts.length > 0) {
-
-          this.web3Service.channelProcessedEvent(accounts[lastLength].address, 0);
+          this.web3Service.channelProcessedEventFar(accounts[lastLength].address, 0);
+          this.web3Service.channelProcessedEventNear(accounts[lastLength].address, 0);
           this.updateChannels(accounts[lastLength].address);
+          console.log('New address fired!', accounts[lastLength].address, lastLength);
           lastLength = accounts.length;
-          console.log('New address fired!');
         }
 
         release();
+      }).catch(error => {
+        console.log("Mutex error: ", error)
       });
         
     });
@@ -47,16 +49,13 @@ export class AppComponent {
     let lastLenght = 0;
 
     this.web3Service.channels$.subscribe(channels => {
-
-      this.mutex.acquire().then(function(release) {
-        if (channels.size > 0 && channels.get(address).length != lastLenght) {
-          this.listenChannelEvents(channels.get(address)[lastLenght], address);
-          lastLenght = channels.get(address).length;
-          console.log("New channel fired!");
-        }
         
-        release();
-      });
+      if (channels.size > 0 && channels.get(address).length != lastLenght) {
+        this.listenChannelEvents(channels.get(address)[lastLenght], address);
+        lastLenght = channels.get(address).length;
+        console.log("New channel fired!");
+      }
+       
     });
   }
   
@@ -66,6 +65,7 @@ export class AppComponent {
     this.web3Service.disputeStateEvent(address, channel, 0);
     this.web3Service.channelCloseRequestEvent(address, channel, 0);
     this.web3Service.channelCloseEvent(address, channel, 0);
+    this.web3Service.randomShowedEvent(address, channel, 0);
   }
 
 }

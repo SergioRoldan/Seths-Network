@@ -185,4 +185,12 @@ export class OperationComponent implements OnInit, OnDestroy {
     return true;
   }
 
+  canBeRandoms(randoms:string): boolean {
+    let rands = randoms.split(';');
+
+    for(let rand of rands) 
+      if(!canBeNumber(rand)  || rand.toString().length != 66)
+        return false
+  }
+
 }

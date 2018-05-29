@@ -129,6 +129,23 @@
       </div>
     </div>
 
+    <!--<div class="field">
+      <label class="label">Randoms</label>
+      <p class="control">
+        <input [(ngModel)]="updateRandoms" class="input" type="text" placeholder="Write hash locked transaction randoms separated by ; (without spaces)" name="updateRandoms" required #updateRandomsModel="ngModel">
+      </p>
+      <div *ngIf="updateRandomsModel.errors && (updateRandomsModel.dirty || updateRandomsModel.touched)" class="help is-danger">
+        <p [hidden]="!updateRandomsModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!updateRandomsModel.errors && (updateRandomsModel.dirty ||updateRandomsModel.touched)" class="help is-danger">
+        <p [hidden]="canBeRandoms(updateRandoms)">
+          Must be in bytes32 format separated with ;
+        </p>
+      </div>
+    </div>-->
+
     <div class="field">
       <label class="label">Signature</label>
       <p class="control">
@@ -160,5 +177,7 @@
 
   </form>
 </div>
+
+<br>
 
 <button (click)="goBack()" class="button is-primary"> Go Back </button>

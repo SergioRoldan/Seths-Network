@@ -19,38 +19,40 @@
     <p>Randoms: {{channel.randoms}}</p>
     <p>Hashed: {{channel.hashes}}</p>
 
-    <div class="container padd" *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && !channel.accepted">
+    <br>
+
+    <div *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && !channel.accepted">
     
       <h5 class="title is-4">Accept channel</h5>
       <h5 class="title is-5 is-info help">{{status}}</h5>
     
       <form #acceptForm="ngForm" class="form-inline">
     
-        <div class="field">
-          <label class="label">Amount</label>
+        <div class="field margin">
           <p class="control">
             <input [(ngModel)]="acceptAmount" name="acceptAmount" class="input" type="text" placeholder="1 Ether" required #acceptAmountModel="ngModel">
           </p>
-          <div *ngIf="acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
-            <p [hidden]="!acceptAmountModel.errors.required">
-              This field is required
-            </p>
-          </div>
-          <div *ngIf="!acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger">
-            <p [hidden]="enoughEther(acceptAmount)">
-              Must have enough ether and a number
-            </p>
-          </div>
         </div>
     
-        <div class="field is-grouped right">
+        <div class="field is-grouped margin">
           <p class="control">
             <button [disabled]="!acceptForm.valid" (click)="acceptChannel()" class="button is-primary">
               Accept channel
             </button>
           </p>
-    
         </div>
+
+        <div *ngIf="acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger margin">
+          <p [hidden]="!acceptAmountModel.errors.required">
+            This field is required
+          </p>
+        </div>
+        <div *ngIf="!acceptAmountModel.errors && (acceptAmountModel.dirty || acceptAmountModel.touched)" class="help is-danger margin">
+          <p [hidden]="enoughEther(acceptAmount)">
+            Must have enough ether and a number
+          </p>
+        </div>
+
       </form>
     </div>
     

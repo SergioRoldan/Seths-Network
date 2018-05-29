@@ -7,6 +7,6 @@ p {
   margin: 0 auto;
 }
 
-.right {
-  float: right;
+.margin {
+  margin: 3px;
 }
