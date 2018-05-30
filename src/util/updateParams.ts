@@ -20,20 +20,30 @@ export class updateParams {
     rhVals: any[];
     ends: any[];
 
-    constructor(web3, end, chann, values, id, signature, rsSigned = [], rs = [], hs = [], ttls = [], rhVals = [], ends = []) {
+    constructor(web3, end, chann, values, id, signature, rs = [], ttls = [], rhVals = [], ends = [], rsSigned = []) {
         this.web3 = web3;
         
         this.end_chann = [end, chann];
-        this.values_id = [this.web3.utils.toWei(values, 'ether'), id];
+        this.values_id = [this.web3.utils.toWei(values.toString(), 'ether'), id];
 
-        console.log(this.values_id);
-
-        this.rsSigned = rsSigned;
         this.rs = rs;
-        this.hs = hs;
-        this.ttls = ttls;
-        this.rhVals = rhVals;
-        this.ends = ends;
+        this.hs = [];
+        if(rs.length > 0) {
+            this.generateHashes(rs);
+            this.ttls = ttls;
+            this.rhVals = [];
+            this.ends = ends;
+            this.rsSigned = rsSigned;
+
+            for(let v of rhVals) 
+                this.rhVals.push(this.web3.utils.toWei(v, 'ether'));
+
+        } else {
+            this.rhVals = [];
+            this.ttls = ttls;
+            this.ends = ends;
+            this.rsSigned = rsSigned;
+        }
         
         if(signature == null || signature == '') {
             this.generateSignature().then(res => {
@@ -59,16 +69,26 @@ export class updateParams {
                 { t: 'uint256', v: this.values_id },
                 { t: 'address', v: this.end_chann }
             );
-
-            console.log(hsh);
-            console.log(this.end_chann);
             
+            return this.web3.eth.sign(hsh, this.end_chann[0]);
+        } else {
+            console.log(this.hs, this.ttls, this.rhVals, this.ends);
+
+            let hsh = this.web3Utils.soliditySha3(
+                { t: 'uint256', v: this.values_id },
+                { t: 'address', v: this.end_chann },
+                { t: 'bytes32', v: this.rsSigned },
+                { t: 'bytes32', v: this.hs },
+                { t: 'uint256', v: this.ttls },
+                { t: 'uint256', v: this.rhVals },
+                { t: 'uint256', v: this.ends }
+            );
+
             return this.web3.eth.sign(hsh, this.end_chann[0]);
         }
     }
 
     parseSignature(signature: any): any {
-        console.log(signature);
         
         let sign = signature.substring(2);
         let r = '0x' + sign.slice(0, 64);
@@ -78,4 +98,14 @@ export class updateParams {
 
         return {'r': r, 's': s, 'v': v_dec};
     }
-}
+
+    generateHashes(randoms: any) {
+        for(let rand of randoms) {
+            let h = this.web3Utils.soliditySha3(
+                { t: 'bytes32', v: rand }
+            );
+            this.hs.push(h);
+        }
+    }
+    
+ }

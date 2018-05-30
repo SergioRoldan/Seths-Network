@@ -217,6 +217,8 @@ export class Web3Service implements OnInit {
   async updateState(contract, self, updateParameters: updateParams): Promise<any> {
     let instance = await this.Channel.at(contract);
 
+    console.log(updateParameters);
+
     return instance.updateState(
       updateParameters.end_chann, updateParameters.values_id,
       updateParameters.v, updateParameters.r_s,
@@ -271,19 +273,11 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      for(let ran in res.args.random) {
-        if(channel.checkRandomHashesInH(ran)) {
-          channel.addRandomLock(ran)
-          console.log("Random showed");
-        }
-          
-      }
-      for(let ran in res.args.randomS) {
-        if (channel.checkRandomHashesInH(ran)) {
-          channel.addRandomLock(ran)
-          console.log("Random showed");
-        }
-      }
+      console.log(res.args);
+
+      channel.getRsShowed(res.args.random);
+
+      console.log(channel)
 
       this.updateChannelsSource(self, channel, true);
     });

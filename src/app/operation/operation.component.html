@@ -129,10 +129,10 @@
       </div>
     </div>
 
-    <!--<div class="field">
+    <div class="field">
       <label class="label">Randoms</label>
       <p class="control">
-        <input [(ngModel)]="updateRandoms" class="input" type="text" placeholder="Write hash locked transaction randoms separated by ; (without spaces)" name="updateRandoms" required #updateRandomsModel="ngModel">
+        <input [(ngModel)]="updateRandoms" class="input" type="text" placeholder="Write hash locked transactions randoms in bytes32 format, separated by ; and without spaces" name="updateRandoms" required #updateRandomsModel="ngModel">
       </p>
       <div *ngIf="updateRandomsModel.errors && (updateRandomsModel.dirty || updateRandomsModel.touched)" class="help is-danger">
         <p [hidden]="!updateRandomsModel.errors.required">
@@ -140,11 +140,65 @@
         </p>
       </div>
       <div *ngIf="!updateRandomsModel.errors && (updateRandomsModel.dirty ||updateRandomsModel.touched)" class="help is-danger">
-        <p [hidden]="canBeRandoms(updateRandoms)">
-          Must be in bytes32 format separated with ;
+        <p [hidden]="canBeBytes32(updateRandoms)">
+          Must be in bytes32 format
         </p>
       </div>
-    </div>-->
+    </div>
+  
+    <div class="field">
+      <label class="label">TTLs</label>
+      <p class="control">
+        <input [(ngModel)]="updateTTLs" class="input" type="text" placeholder="Write hash locked transactions TTLs, separated by ; and without spaces"
+          name="updateTTLs" required #updateTTLsModel="ngModel">
+      </p>
+      <div *ngIf="updateTTLsModel.errors && (updateTTLsModel.dirty || updateTTLsModel.touched)" class="help is-danger">
+        <p [hidden]="!updateTTLsModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!updateTTLsModel.errors && (updateTTLsModel.dirty ||updateTTLsModel.touched)" class="help is-danger">
+        <p [hidden]="canBeNumbers(updateTTLs)">
+          Must be in number format
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">RHVals</label>
+      <p class="control">
+        <input [(ngModel)]="updateRHVals" class="input" type="text" placeholder="Write hash locked transactions RHVals, separated by ; and without spaces"
+          name="updateRHVals" required #updateRHValsModel="ngModel">
+      </p>
+      <div *ngIf="updateRHValsModel.errors && (updateRHValsModel.dirty || updateRHValsModel.touched)" class="help is-danger">
+        <p [hidden]="!updateRHValsModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!updateRHValsModel.errors && (updateRHValsModel.dirty ||updateRHValsModel.touched)" class="help is-danger">
+        <p [hidden]="canBeNumbers(updateRHVals)">
+          Must be in number format
+        </p>
+      </div>
+    </div>
+  
+    <div class="field">
+      <label class="label">Direction</label>
+      <p class="control">
+        <input [(ngModel)]="updateDirection" class="input" type="text" placeholder="Write hash locked transactions Direction, separated by ; and without spaces  (use 0 for outgoings and 1 otherwise)"
+          name="updateDirection" required #updateDirectionModel="ngModel">
+      </p>
+      <div *ngIf="updateDirectionModel.errors && (updateDirectionModel.dirty || updateDirectionModel.touched)" class="help is-danger">
+        <p [hidden]="!updateDirectionModel.errors.required">
+          This field is required
+        </p>
+      </div>
+      <div *ngIf="!updateDirectionModel.errors && (updateDirectionModel.dirty ||updateDirectionModel.touched)" class="help is-danger">
+        <p [hidden]="canBeNumbers(updateDirection)">
+          Must be in number format
+        </p>
+      </div>
+    </div>
 
     <div class="field">
       <label class="label">Signature</label>

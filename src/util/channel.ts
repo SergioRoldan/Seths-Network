@@ -19,6 +19,11 @@ export class channel {
 
     randoms: any[];
     hashes: any[];
+    ttls: any[];
+    rhvals: any[];
+    direction: any[];
+
+    rsShowed: any[];
 
     constructor(address, nearEnd, farEnd, value, endDate, nearEndValue, farEndValue, accepted = false, id = 0, closed = false) {
         this.address = address;
@@ -32,6 +37,10 @@ export class channel {
         this.id = id;
         this.randoms = [];
         this.hashes = [];
+        this.ttls = [];
+        this.rhvals = [];
+        this.rsShowed = [];
+        this.direction = [];
         this.closed = closed;
     }
 
@@ -55,12 +64,65 @@ export class channel {
         this.hashes.push(hash);
     }
 
-    checkRandomHashesInH(random: any) {
+    getRsShowed(rsShowed: any) {
+        if(this.randoms.length >0) {
+            for (let r of rsShowed) {
+                let index = this.checkRandomHashesInH(r);
+                if (index != -1)
+                    this.rsShowed.push(index);
+            }
+            this.generateHashes(this.randoms);
+        } else {
+            this.generateHashes(rsShowed);
+            this.randoms = rsShowed;
+
+            for (let r of rsShowed) {
+                let index = this.checkRandomHashesInH(r);
+                if (index != -1)
+                    this.rsShowed.push(index);
+            }
+            
+            this.generateHashes(this.randoms);
+            
+        }
+        
+    }
+
+    generateHashes(randoms: any) {
+        this.hashes = [];
+
+        for (let rand of randoms) {
+            let h = this.web3Utils.soliditySha3(
+                { t: 'bytes32', v: rand }
+            );
+            this.hashes.push(h);
+        }
+    }
+
+    checkRandomHashesInH(random: any): any {
         let h = this.web3Utils.soliditySha3(
             { t: 'bytes32', v: random}
         );
 
-        return this.hashes.includes(h);
+        console.log(this.hashes, h, this.randoms);
+
+        let found = -1;
+
+        for(let i = 0; i < this.randoms.length && found == -1; i++) 
+            if(h == this.hashes[i]) {
+                found = i;
+                delete this.hashes[i];
+            }
+                
+        return found;
+    }
+
+    paramToChann(param: any) {
+        this.hashes = param.hs;
+        this.randoms = param.rs;
+        this.ttls = param.ttls;
+        this.direction = param.ends;
+        this.rhvals = param.rhVals;
     }
 
 }

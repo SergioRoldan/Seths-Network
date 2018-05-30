@@ -16,8 +16,19 @@
     <p>Accepted: {{channel.accepted}}</p>
     <p>Closed: {{channel.closed}}</p>
     <br>
-    <p>Randoms: {{channel.randoms}}</p>
-    <p>Hashed: {{channel.hashes}}</p>
+    <div *ngFor="let index of channel.rsShowed">
+      <p>Random: {{channel.randoms[index]}}</p>
+      <p>Hash: {{channel.hashes[index]}}</p>
+      <div *ngIf="channel.ttls[index]">
+        <p>TTL: {{channel.ttls[index]}}</p>
+        <p>Value: {{channel.rhvals[index]}}</p>
+        <p *ngIf="account.address.toLowerCase() == channel.nearEnd.toLowerCase() && channel.direction[index] == 0">Direction: I'm the receiver</p>
+        <p *ngIf="account.address.toLowerCase() == channel.nearEnd.toLowerCase() && channel.direction[index] == 1">Direction: I'm the sender</p>
+        <p *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && channel.direction[index] == 1">Direction: I'm the receiver</p>
+        <p *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && channel.direction[index] == 0">Direction: I'm the sender</p>
+      </div>
+      
+    </div>
 
     <br>
 
