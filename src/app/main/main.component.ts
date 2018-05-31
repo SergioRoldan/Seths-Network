@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Web3Service } from '../web3.service';
 import { account } from '../../util/account';
 import { Router } from '@angular/router';
+import { FilterPipe } from '../../util/filter.pipe';
 
 @Component({
   selector: 'app-main',
@@ -12,6 +13,8 @@ import { Router } from '@angular/router';
 export class MainComponent implements OnInit {
 
   accounts: account[] = [];
+
+  searchString: string;
 
   selectedAccount: any = null;
 
@@ -29,7 +32,5 @@ export class MainComponent implements OnInit {
   updateAccounts() {
     this.web3Service.accounts$.subscribe(accounts => this.accounts = accounts);
   }
-
-
 
 }

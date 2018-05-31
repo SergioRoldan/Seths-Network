@@ -1,9 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
+var Datastore = require('nedb');
 
 @Injectable({
   providedIn: 'root'
 })
-export class NedbService {
+export class NedbService implements OnInit {
 
-  constructor() { }
+  db: any;
+
+  constructor() { 
+    db = new Datastore({filename: '../../db', autoload:true});
+  }
+
+  ngOnInit() {
+
+  }
 }

@@ -22,3 +22,8 @@ th, td {
 }
 
 tr:hover {background-color: #e0e0e0;}
+
+.width {
+  width: 100%;
+  border-radius: 15px;
+}

@@ -11,6 +11,7 @@ import { AccountComponent } from './account/account.component';
 import { ChannelsComponent } from './channels/channels.component';
 import { OperationComponent } from './operation/operation.component';
 import { LightningComponent } from './lightning/lightning.component';
+import { FilterPipe } from '../util/filter.pipe';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { LightningComponent } from './lightning/lightning.component';
     AccountComponent,
     ChannelsComponent,
     OperationComponent,
-    LightningComponent
+    LightningComponent,
+    FilterPipe
   ],
   imports: [
     BrowserModule,
