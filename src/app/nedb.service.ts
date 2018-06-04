@@ -34,6 +34,9 @@ export class NedbService implements OnInit {
     this.db.accounts = new Datastore({ filename: 'accounts.db', inMemoryOnly: false, autoload: true });
     this.db.channels = new Datastore({ filename: 'channels.db', inMemoryOnly: false, autoload: true });
 
+    this.db.accounts.persistence.compactDatafile();
+    this.db.channels.persistence.compactDatafile();
+
     this.db.accounts.ensureIndex({ fieldName: 'address', unique: true }, (err) => {
       if(err)
         console.log("Unique violated by one or more objects in db: ", err);
