@@ -6,7 +6,6 @@ import { takeWhile } from 'rxjs/operators';
 import { updateParams } from '../util/updateParams';
 
 const Web3 = require('web3');
-const Web3Utils = require('web3-utils');
 const contract = require('truffle-contract');
 
 const factoryArtifacts = require('../../build/contracts/Factory.json');
@@ -18,7 +17,6 @@ const channelArtifacts = require('../../build/contracts/ChannelFinal.json');
 export class Web3Service implements OnInit {
 
   web3: any;
-  web3Utils: any = Web3Utils;
 
   Factory = contract(factoryArtifacts);
   Channel = contract(channelArtifacts);

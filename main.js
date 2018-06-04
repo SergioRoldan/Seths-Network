@@ -11,7 +11,6 @@ function createWindow() {
         icon: `file://${__dirname}/dist/angular-truffle-dapp/favicon.ico`
     })
 
-
     win.loadURL(`file://${__dirname}/dist/angular-truffle-dapp/index.html`)
 
     //// uncomment below to open the DevTools.

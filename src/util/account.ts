@@ -6,7 +6,9 @@ export class account {
     balance: any;
     channels: channel[];
 
-    constructor(address, balance) {
+    constructor();
+    constructor(address, account);
+    constructor(address?, balance?) {
         this.address = address;
         this.balance = balance;
         this.channels = [];
@@ -14,6 +16,12 @@ export class account {
 
     pushChannel(channel: channel) {
         this.channels.push(channel);
+    }
+
+    map(object) {
+        this.address = object.address;
+        this.balance = object.balance;
+        this.channels = object.channels;
     }
 
 }

@@ -1,7 +1,8 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 import {channel} from '../util/channel';
 import {Web3Service} from './web3.service';
+import {NedbService} from './nedb.service';
 import {account} from '../util/account';
 import {Mutex, MutexInterface} from 'async-mutex';
 
@@ -10,12 +11,12 @@ import {Mutex, MutexInterface} from 'async-mutex';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   mutex: Mutex;
 
 
-  constructor(private web3Service: Web3Service) {
+  constructor(private web3Service: Web3Service, private nedbService: NedbService) {
     this.mutex = new Mutex();
   }
 

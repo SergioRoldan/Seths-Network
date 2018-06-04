@@ -8,8 +8,6 @@ export class channel {
     value: any;
     endDate: any;
 
-    web3Utils: any = Web3Utils;
-
     accepted: any;
     closed: any;
 
@@ -25,7 +23,9 @@ export class channel {
 
     rsShowed: any[];
 
-    constructor(address, nearEnd, farEnd, value, endDate, nearEndValue, farEndValue, accepted = false, id = 0, closed = false) {
+    constructor();
+    constructor(address, nearEnd, farEnd, value, endDate, nearEndValue, farEndValue);
+    constructor(address?, nearEnd?, farEnd?, value?, endDate?, nearEndValue?, farEndValue?, accepted = false, id = 0, closed = false) {
         this.address = address;
         this.nearEnd = nearEnd;
         this.farEnd = farEnd;
@@ -92,7 +92,7 @@ export class channel {
         this.hashes = [];
 
         for (let rand of randoms) {
-            let h = this.web3Utils.soliditySha3(
+            let h = Web3Utils.soliditySha3(
                 { t: 'bytes32', v: rand }
             );
             this.hashes.push(h);
@@ -100,7 +100,7 @@ export class channel {
     }
 
     checkRandomHashesInH(random: any): any {
-        let h = this.web3Utils.soliditySha3(
+        let h = Web3Utils.soliditySha3(
             { t: 'bytes32', v: random}
         );
 
@@ -123,6 +123,25 @@ export class channel {
         this.ttls = param.ttls;
         this.direction = param.ends;
         this.rhvals = param.rhVals;
+    }
+
+    map(object) {
+        this.address = object.address;
+        this.nearEnd = object.nearEnd;
+        this.farEnd = object.farEnd;
+        this.value = object.value;
+        this.endDate = object.endDate;
+        this.accepted = object.accepted;
+        this.farEndValue = object.farEndValue;
+        this.nearEndValue = object.nearEndValue;
+        this.id = object.id;
+        this.randoms = object.randoms;
+        this.hashes = object.hashes;
+        this.ttls = object.ttls;
+        this.rhvals = object.rhvals;
+        this.rsShowed = object.rsShowed;
+        this.direction = object.direction;
+        this.closed = object.closed;
     }
 
 }
