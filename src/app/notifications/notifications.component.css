@@ -1,0 +1,29 @@
+.padd {
+    padding: 5px;
+}
+
+.highlighted{
+  background: #e0e0e0;
+}
+
+th, td {
+    border-bottom: 1px solid #ddd;
+    padding: 15px;
+    text-align: left;
+}
+
+.center {
+  margin-top: 20px;
+  margin: 0 auto;
+}
+
+.blue {
+  background: rgb(40, 101, 192);
+}
+
+tr:hover {background-color: #e0e0e0;}
+
+.width {
+  width: 100%;
+  border-radius: 15px;
+}

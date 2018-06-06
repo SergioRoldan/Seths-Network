@@ -2,9 +2,11 @@ import { Injectable, OnInit } from '@angular/core';
 import { channel } from '../util/channel';
 import { account } from '../util/account';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
 import { updateParams } from '../util/updateParams';
+import { error } from '../util/error';
 import { NedbService } from './nedb.service';
+import { NotificationsService } from './notifications.service';
+import { notification } from '../util/notification';
 
 const Web3 = require('web3');
 const contract = require('truffle-contract');
@@ -31,7 +33,7 @@ export class Web3Service implements OnInit {
   accounts$ = this.accountsSource.asObservable();
   channels$ = this.channelsSource.asObservable();
   
-  constructor(private neDBService: NedbService) {
+  constructor(private neDBService: NedbService, private notificationsService: NotificationsService) {
     this.checkAndInstantiateWeb3();
     this.retrieveAccountsFromDB();
     this.retrieveAccountsFromEth();
@@ -43,12 +45,13 @@ export class Web3Service implements OnInit {
   checkAndInstantiateWeb3() {
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof this.web3 !== 'undefined') {
-      console.warn('Using web3 detected from external source. If you find that your accounts don\'t appear or you have ' +
-        '0 Ether, ensure you\'ve configured that source properly.');
+      let err = new error('Web3Service', 'Web3 injected by the browser', 'warning');
+      this.notificationsService.addErrorSource(err);
       // Use Mist/MetaMask's provider
       this.web3 = new Web3(this.web3.currentProvider);
     } else {
-      console.warn('No web3 detected. Falling back to http://localhost:7545.');
+      let err = new error('Web3Service', 'Web3 not injected, falling back to localhost:7545', 'warning');
+      this.notificationsService.addErrorSource(err);
       // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
       this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
     }
@@ -64,26 +67,30 @@ export class Web3Service implements OnInit {
         this.updateBalance(acc);
       }
     }).catch(e => {
-      console.log(e);
+      let err = new error('NeDBService', 'Error retrieving accounts from DB' + e, 'danger');
+      this.notificationsService.addErrorSource(err);
     });
   }
 
   retrieveAccountsFromEth() {
     this.web3.eth.getAccounts((err, accs) => {
       if (err != null) {
-        alert('There was an error fetching your accounts.');
+        let e = new error('Web3Service', 'Error retrieving accounts from node' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
       if (accs.length === 0) {
-        alert('Couldn\'t get any accounts! Make sure your Ethereum client is configured correctly.');
+        let e = new error('Web3Service', 'Zero accounts retrieved from node, check node configuration' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
       for (let acc of accs) {
         this.web3.eth.getBalance(acc, (err, val) => {
           if (err != null) {
-            alert('There was an error fetching balance of account ' + acc + ': ' + err);
+            let e = new error('Web3Service', 'Error retrieving accounts balance' + err, 'danger');
+            this.notificationsService.addErrorSource(e);
             return;
           }
 
@@ -124,11 +131,13 @@ export class Web3Service implements OnInit {
         
         ev.watch((err, res) => {
           if (err != null) {
-            alert('There was an error getting event for account X');
+            let e = new error('Web3Service', 'Error processing new channel event' + err, 'danger');
+            this.notificationsService.addErrorSource(e);
             return;
           }
 
-          console.log("-> New channel far event catched")
+          let n = new notification('Web3Service', 'New channels event catched', 'info');
+          this.notificationsService.addNotificationsSource(n);
           
           let tmp = new channel(
             res.args.ContractAddrs,
@@ -157,11 +166,13 @@ export class Web3Service implements OnInit {
 
         ev2.watch((err, res) => {
           if (err != null) {
-            alert('There was an error getting event for account X');
+            let e = new error('Web3Service', 'Error processing new channel event' + err, 'danger');
+            this.notificationsService.addErrorSource(e);
             return;
           }
 
-          console.log("-> New channel near event catched")
+          let n = new notification('Web3Service', 'New channels event catched', 'info');
+          this.notificationsService.addNotificationsSource(n);
           
           let tmp = new channel(
             res.args.ContractAddrs,
@@ -202,11 +213,13 @@ export class Web3Service implements OnInit {
     
     evt.watch((error, result) => {
       if (error != null) {
-        alert('There was an error getting event accepted from channel ' + channel);
+        let e = new error('Web3Service', 'Error processing accept channel event' + error, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
-      console.log("-> Accept event catched");
+      let n = new notification('Web3Service', 'New accept event catched', 'info');
+      this.notificationsService.addNotificationsSource(n);
       
       channel.value = this.web3.utils.fromWei(result.args.totalValue.toString());
       channel.accepted = true;
@@ -253,11 +266,13 @@ export class Web3Service implements OnInit {
     
     ev.watch((err, res) => {
       if(err != null) {
-        alert('There was an error getting event update state from channel ' + channel.address);
+        let e = new error('Web3Service', 'Error processing update state event' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
-      console.log("-> Update event catched");
+      let n = new notification('Web3Service', 'Update state event catched', 'info');
+      this.notificationsService.addNotificationsSource(n);
 
       channel.id = res.args.currentId;
 
@@ -284,10 +299,13 @@ export class Web3Service implements OnInit {
     
     ev.watch((err, res) => {
       if (err != null) {
-        alert('There was an error getting event random showed from channel ' + channel.address);
+        let e = new error('Web3Service', 'Error processing radom showed event' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
+      let n = new notification('Web3Service', 'Random showed event catched', 'info');
+      this.notificationsService.addNotificationsSource(n);
       channel.getRsShowed(res.args.random);
       
       this.updateLastBlock(res.blockNumber);
@@ -318,11 +336,13 @@ export class Web3Service implements OnInit {
     
     ev.watch((error, result) => {
       if (error != null) {
-        alert('There was an error getting event dispute state from channel ' + channel.address);
+        let e = new error('Web3Service', 'Error processing dispute state event' + error, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
       
-      console.log("-> Dispute event catched");
+      let n = new notification('Web3Service', 'Dispute state event catched', 'info');
+      this.notificationsService.addNotificationsSource(n);
 
       channel.id = result.args.currentId;
 
@@ -352,12 +372,14 @@ export class Web3Service implements OnInit {
     
     ev.watch((err, res) => {
       if (err != null) {
-        alert('There was an error getting event close request from channel ' + channel.address);
+        let e = new error('Web3Service', 'Error processing close request channel event' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
       this.updateLastBlock(res.blockNumber);
-      console.log("Close request from " + res.args.end + " catched: " + res.args.closeChange);
+      let n = new notification('Web3Service', "Close request from " + res.args.end + " catched: " + res.args.closeChange, 'info');
+      this.notificationsService.addNotificationsSource(n);
 
       //this.updateChannelsSource(self, channel, true);
     });
@@ -382,7 +404,8 @@ export class Web3Service implements OnInit {
     
     ev.watch((err, res) => {
       if (err != null) {
-        alert('There was an error getting event close from channel ' + channel.address);
+        let e = new error('Web3Service', 'Error processing close channel event' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
@@ -391,7 +414,9 @@ export class Web3Service implements OnInit {
       channel.farEndValue = this.web3.utils.fromWei(res.args.farEndFinalValue.toString());
       channel.id = res.args.finalId
 
-      console.log("-> Close event catched");
+      let n = new notification('Web3Service', "Close event catched", 'info');
+      this.notificationsService.addNotificationsSource(n);
+
 
       this.updateLastBlock(res.blockNumber);
       this.updateChannelsSource(self, channel, true);
@@ -451,9 +476,14 @@ export class Web3Service implements OnInit {
   updateBalance(account: account) {
     this.web3.eth.getBalance(account.address, (err, val) => {
       if (err != null) {
-        alert('There was an error fetching balance of account ' + account.address + ': ' + err);
+        let e = new error('Web3Service', 'Error processing update balance' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
+
+      let n = new notification('Web3Service', "Account balance updated", 'info');
+      this.notificationsService.addNotificationsSource(n);
+
       account.balance = this.web3.utils.fromWei(val.toString());
       this.updateAccountSource(account, true);
     });

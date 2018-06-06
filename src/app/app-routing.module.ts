@@ -7,10 +7,12 @@ import { ChannelDetailsComponent } from './channel-details/channel-details.compo
 import { ChannelsComponent } from './channels/channels.component';
 import { OperationComponent } from './operation/operation.component';
 import { LightningComponent } from './lightning/lightning.component';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/main', pathMatch: 'full' },
-  { path: 'main', component: MainComponent},  
+  { path: 'main', component: MainComponent}, 
+  { path: 'notifications', component: NotificationsComponent}, 
   { path: 'accounts/:account', 
     component: AccountComponent,
     children: [

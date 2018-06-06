@@ -5,6 +5,8 @@ import {Web3Service} from './web3.service';
 import {NedbService} from './nedb.service';
 import {account} from '../util/account';
 import {Mutex, MutexInterface} from 'async-mutex';
+import { NotificationsService } from './notifications.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -14,13 +16,16 @@ import {Mutex, MutexInterface} from 'async-mutex';
 export class AppComponent implements OnInit {
 
   mutex: Mutex;
+  totalNotifications: number;
 
 
-  constructor(private web3Service: Web3Service, private nedbService: NedbService) {
+  constructor(private web3Service: Web3Service, private nedbService: NedbService, 
+    private notificationsService: NotificationsService, public router: Router) {
     this.mutex = new Mutex();
   }
 
   ngOnInit() {
+    this.notificationsService.total$.subscribe(total => this.totalNotifications = total);
     this.updateAccounts();
   }
 
@@ -86,5 +91,10 @@ export class AppComponent implements OnInit {
     this.web3Service.channelCloseEvent(address, channel);
     this.web3Service.randomShowedEvent(address, channel);
   }
+
+  navigateNotifications() {
+    this.router.navigate(['/notifications']);
+  }
+
 
 }
