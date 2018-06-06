@@ -1,6 +1,8 @@
 import { Injectable, OnInit } from '@angular/core';
 import { channel } from '../util/channel';
 import { account } from '../util/account';
+import { error } from '../util/error';
+import { NotificationsService } from './notifications.service';
 var Datastore = require('nedb');
 
 
@@ -11,7 +13,7 @@ export class NedbService implements OnInit {
 
   db: any;
 
-  constructor() { 
+  constructor(private notificationsService: NotificationsService) { 
 
     this.loadDbs();
 
@@ -28,8 +30,10 @@ export class NedbService implements OnInit {
     this.db.channels.persistence.compactDatafile();
 
     this.db.accounts.ensureIndex({ fieldName: 'address', unique: true }, (err) => {
-      if(err)
-        console.log("Unique violated by one or more objects in db: ", err);
+      if(err){
+        let e = new error('NeDBService', 'Error unique id violated' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
+      }
     });
     /*this.db.channels.ensureIndex({ fieldName: 'channel.address', unique: true }, (err) => {
       if(err)
@@ -138,7 +142,8 @@ export class NedbService implements OnInit {
   insertAccount(account: account) {
     this.db.accounts.insert(account, (err, newDoc) => {
       if (err) {
-        console.log("Error Insert Account ", err);
+        let e = new error('NeDBService', 'Error inserting account' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
@@ -149,7 +154,8 @@ export class NedbService implements OnInit {
   insertChannel(account, channel: channel) {
     this.db.channels.insert({ account: account, channel: channel }, (err, newDoc) => {
       if (err) {
-        console.log("Error Insert Channel ", err);
+        let e = new error('NeDBService', 'Error inserting channel' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
@@ -160,7 +166,8 @@ export class NedbService implements OnInit {
   deleteAccount(address) {
     this.db.accounts.remove({ "address": address }, (err, numRemoved) => {
       if (err) {
-        console.log("Error Remove Account ", err);
+        let e = new error('NeDBService', 'Error removing account' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
@@ -171,7 +178,8 @@ export class NedbService implements OnInit {
   deleteChannel(address) {
     this.db.channels.remove({ "channel.address": address }, (err, numRemoved) => {
       if (err) {
-        console.log("Error Remove Channel ", err);
+        let e = new error('NeDBService', 'Error removing channel' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
@@ -182,7 +190,8 @@ export class NedbService implements OnInit {
   updateChannel(account, channel: channel, upsert?) {
     this.db.channels.update({ "channel.address": channel.address, "account": account }, { account: account, channel: channel }, upsert || {}, (err, numReplaced) => {
       if (err) {
-        console.log("Error Update Channel ", err);
+        let e = new error('NeDBService', 'Error updating channel' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 
@@ -193,7 +202,8 @@ export class NedbService implements OnInit {
   updateAccount(account: account, upsert?) {
     this.db.accounts.update({ "address": account.address }, account, upsert || {}, (err, numReplaced) => {
       if (err) {
-        console.log("Error Update Account ", err);
+        let e = new error('NeDBService', 'Error updating account' + err, 'danger');
+        this.notificationsService.addErrorSource(e);
         return;
       }
 

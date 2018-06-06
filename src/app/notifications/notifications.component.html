@@ -12,20 +12,21 @@
       <td>
         <b>Parameters</b>
       </td>
-      <td>
-        <b>Extra</b>
-      </td>
     </thead>
     <tbody>
-      <tr *ngFor="let notf of notifications" [class.highlighted]="selectedNotifications.includes(err)" (click)="selectNotification(notf)">
+      <tr class="alert" [class.alert-info]="notf.parameters == info" [class.alert-success]="notf.parameters == success" 
+        *ngFor="let notf of notifications" [class.highlighted]="selectedNotifications.includes(notf)" (click)="selectNotification(notf)">
         
-        <div class="alert" [class.alert-info]="notf.parameters == info" [class.alert-success]="notf.parameters == success">
-          <td>{{notf.origin}}</td>
-          <td>{{notf.message}}</td>
-          <td>{{notf.parameters}}</td>
-          <td *ngIf="notf.objects != null">{{notf.objects}}</td>
-        </div>
-
+        <td>
+          {{notf.origin}}
+        </td>
+        <td>
+          {{notf.message}}
+        </td>
+        <td>
+          {{notf.parameters}}
+        </td>
+        
       </tr>
     </tbody>
   </table>
@@ -43,6 +44,8 @@
 <div class="container center" *ngIf="errors != null && errors.length > 0">
 
   <h5 class="title is-4"> Errors/Warnings</h5>
+  {{errors.length}}
+  {{errors}}
   <table>
     <thead>
       <td>
@@ -56,12 +59,17 @@
       </td>
     </thead>
     <tbody>
-      <tr *ngFor="let err of errors" [class.highlighted]="selectedErrors.includes(err)" (click)="selectError(err)">
-        <div class="alert" [class.alert-warning]="err.object == warning" [class.alert-danger]="err.object == danger">
-          <td>{{err.origin}}</td>
-          <td>{{err.message}}</td>
-          <td>{{err.object}}</td>
-        </div>
+      <tr *ngFor="let err of errors" class="alert" [class.alert-warning]="err.object == warning" [class.alert-danger]="err.object == danger"
+        [class.highlighted]="selectedErrors.includes(err)" (click)="selectError(err)">
+        <td>
+          {{err.origin}}
+        </td>
+        <td>
+          {{err.message}}
+        </td>
+        <td>
+          {{err.object}}
+        </td>
       </tr>
     </tbody>
   </table>
@@ -86,7 +94,7 @@
   </button>
 </div>
 
-<div *ngIf="errors != null && notifications != null && errors.length == 0 && notifications.length == 0">
+<div class="container center" *ngIf="errors != null && notifications != null && errors.length == 0 && notifications.length == 0">
   <p><b>Unfortunately there's nothing new to be checked :(</b></p>
 </div>
 

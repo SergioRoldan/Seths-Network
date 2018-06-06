@@ -136,7 +136,7 @@ export class Web3Service implements OnInit {
             return;
           }
 
-          let n = new notification('Web3Service', 'New channels event catched', 'info');
+          let n = new notification('Web3Service', 'New channels event catched '+ res.args.ContractAddrs + ' at '+ self, 'info');
           this.notificationsService.addNotificationsSource(n);
           
           let tmp = new channel(
@@ -171,7 +171,7 @@ export class Web3Service implements OnInit {
             return;
           }
 
-          let n = new notification('Web3Service', 'New channels event catched', 'info');
+          let n = new notification('Web3Service', 'New channels event catched ' + res.args.ContractAddrs + ' at ' + self, 'info');
           this.notificationsService.addNotificationsSource(n);
           
           let tmp = new channel(
@@ -218,7 +218,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      let n = new notification('Web3Service', 'New accept event catched', 'info');
+      let n = new notification('Web3Service', 'New accept event catched '+ channel.address, 'info');
       this.notificationsService.addNotificationsSource(n);
       
       channel.value = this.web3.utils.fromWei(result.args.totalValue.toString());
@@ -271,7 +271,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      let n = new notification('Web3Service', 'Update state event catched', 'info');
+      let n = new notification('Web3Service', 'Update state event catched ' + channel.address, 'info');
       this.notificationsService.addNotificationsSource(n);
 
       channel.id = res.args.currentId;
@@ -304,7 +304,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      let n = new notification('Web3Service', 'Random showed event catched', 'info');
+      let n = new notification('Web3Service', 'Random showed event catched ' + channel.address, 'info');
       this.notificationsService.addNotificationsSource(n);
       channel.getRsShowed(res.args.random);
       
@@ -341,7 +341,7 @@ export class Web3Service implements OnInit {
         return;
       }
       
-      let n = new notification('Web3Service', 'Dispute state event catched', 'info');
+      let n = new notification('Web3Service', 'Dispute state event catched ' + channel.address, 'info');
       this.notificationsService.addNotificationsSource(n);
 
       channel.id = result.args.currentId;
@@ -378,7 +378,7 @@ export class Web3Service implements OnInit {
       }
 
       this.updateLastBlock(res.blockNumber);
-      let n = new notification('Web3Service', "Close request from " + res.args.end + " catched: " + res.args.closeChange, 'info');
+      let n = new notification('Web3Service', "Close request from " + res.args.end + " catched at " + self, 'info');
       this.notificationsService.addNotificationsSource(n);
 
       //this.updateChannelsSource(self, channel, true);
@@ -414,7 +414,7 @@ export class Web3Service implements OnInit {
       channel.farEndValue = this.web3.utils.fromWei(res.args.farEndFinalValue.toString());
       channel.id = res.args.finalId
 
-      let n = new notification('Web3Service', "Close event catched", 'info');
+      let n = new notification('Web3Service', "Close event catched " + channel.address, 'info');
       this.notificationsService.addNotificationsSource(n);
 
 
@@ -480,9 +480,6 @@ export class Web3Service implements OnInit {
         this.notificationsService.addErrorSource(e);
         return;
       }
-
-      let n = new notification('Web3Service', "Account balance updated", 'info');
-      this.notificationsService.addNotificationsSource(n);
 
       account.balance = this.web3.utils.fromWei(val.toString());
       this.updateAccountSource(account, true);

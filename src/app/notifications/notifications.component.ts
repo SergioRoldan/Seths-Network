@@ -20,7 +20,10 @@ export class NotificationsComponent implements OnInit {
   constructor(public router: Router, private notificationsService: NotificationsService) { }
 
   ngOnInit() {
-    this.notificationsService.errors$.subscribe(errors => this.errors = errors);
+    this.notificationsService.errors$.subscribe(errors => {
+      this.errors = errors;
+      console.log(errors);
+    });
     this.notificationsService.notifications$.subscribe(notifications => this.notifications = notifications);
   }
 
@@ -30,14 +33,14 @@ export class NotificationsComponent implements OnInit {
 
   selectNotification(notification:notification) {
     if(this.selectedNotifications.includes(notification))
-      delete this.selectedNotifications[this.selectedNotifications.indexOf(notification)];
+      this.selectedNotifications.splice(this.selectedNotifications.indexOf(notification), 1);
     else
       this.selectedNotifications.push(notification);
   }
 
   selectError(error:error) {
     if(this.selectedErrors.includes(error))
-      delete this.selectedErrors[this.selectedErrors.indexOf(error)];
+      this.selectedErrors.splice(this.selectedErrors.indexOf(error), 1);
     else 
       this.selectedErrors.push(error);
   }

@@ -44,7 +44,7 @@ export class NotificationsService implements OnInit{
   removeErrorSource(errors: error[]) {
     for(let e of errors)
       if(this.errors.includes(e)) {
-        delete this.errors[this.errors.indexOf(e)];
+        this.errors.splice(this.errors.indexOf(e),1);
         this.removeTotalSource();
       }
     
@@ -54,7 +54,7 @@ export class NotificationsService implements OnInit{
   removeNotificationsSource(notifications: notification[]) {
     for(let n of notifications)
       if(this.notifications.includes(n)) {
-        delete this.notifications[this.notifications.indexOf(n)];
+        this.notifications.splice(this.notifications.indexOf(n), 1);
         this.removeTotalSource();
       }
 
