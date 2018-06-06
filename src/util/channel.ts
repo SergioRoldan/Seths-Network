@@ -23,9 +23,11 @@ export class channel {
 
     rsShowed: any[];
 
+    lastBlockScr: number;
+
     constructor();
     constructor(address, nearEnd, farEnd, value, endDate, nearEndValue, farEndValue);
-    constructor(address?, nearEnd?, farEnd?, value?, endDate?, nearEndValue?, farEndValue?, accepted = false, id = 0, closed = false) {
+    constructor(address?, nearEnd?, farEnd?, value?, endDate?, nearEndValue?, farEndValue?, lastBlockScr = 0, accepted = false, id = 0, closed = false) {
         this.address = address;
         this.nearEnd = nearEnd;
         this.farEnd = farEnd;
@@ -42,6 +44,7 @@ export class channel {
         this.rsShowed = [];
         this.direction = [];
         this.closed = closed;
+        this.lastBlockScr = lastBlockScr;
     }
 
     setAccepted() {
@@ -142,6 +145,7 @@ export class channel {
         this.rsShowed = object.rsShowed;
         this.direction = object.direction;
         this.closed = object.closed;
+        this.lastBlockScr = object.lastBlockScr;
     }
 
 }

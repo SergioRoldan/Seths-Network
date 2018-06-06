@@ -31,10 +31,28 @@ export class AppComponent implements OnInit {
 
       this.mutex.acquire().then(release => {
         if (accounts.length != lastLength && accounts.length > 0) {
-          this.web3Service.channelProcessedEventFar(accounts[lastLength].address, 0);
-          this.web3Service.channelProcessedEventNear(accounts[lastLength].address, 0);
-          this.updateChannels(accounts[lastLength].address);
-          console.log('New address fired!', accounts[lastLength].address, lastLength);
+
+          for(let i=lastLength; i< accounts.length; i++) {
+            
+            this.updateChannels(accounts[i].address);
+            console.log('New address fired!');
+
+            this.nedbService.getChannels(accounts[i].address).then(val => {
+              for(let v of val) {
+                this.web3Service.updateChannelsSource(accounts[i].address, v, false, true);
+              }
+
+            }).catch(e => {
+              console.log("Error listenig for channels ", e);
+            });
+
+            this.web3Service.sleep(1000).then(() => {
+              this.web3Service.channelProcessedEventFar(accounts[i]);
+              this.web3Service.channelProcessedEventNear(accounts[i]);
+            })
+            
+          }
+          
           lastLength = accounts.length;
         }
 
@@ -61,12 +79,12 @@ export class AppComponent implements OnInit {
   }
   
   listenChannelEvents(channel: channel, address) {
-    this.web3Service.channelAcceptedEvent(address, channel, 0);
-    this.web3Service.updateStateEvent(address, channel, 0);
-    this.web3Service.disputeStateEvent(address, channel, 0);
-    this.web3Service.channelCloseRequestEvent(address, channel, 0);
-    this.web3Service.channelCloseEvent(address, channel, 0);
-    this.web3Service.randomShowedEvent(address, channel, 0);
+    this.web3Service.channelAcceptedEvent(address, channel);
+    this.web3Service.updateStateEvent(address, channel);
+    this.web3Service.disputeStateEvent(address, channel);
+    this.web3Service.channelCloseRequestEvent(address, channel);
+    this.web3Service.channelCloseEvent(address, channel);
+    this.web3Service.randomShowedEvent(address, channel);
   }
 
 }

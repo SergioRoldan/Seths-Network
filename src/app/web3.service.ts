@@ -4,6 +4,7 @@ import { account } from '../util/account';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 import { updateParams } from '../util/updateParams';
+import { NedbService } from './nedb.service';
 
 const Web3 = require('web3');
 const contract = require('truffle-contract');
@@ -30,8 +31,11 @@ export class Web3Service implements OnInit {
   accounts$ = this.accountsSource.asObservable();
   channels$ = this.channelsSource.asObservable();
   
-  constructor() {
+  constructor(private neDBService: NedbService) {
     this.checkAndInstantiateWeb3();
+    this.retrieveAccountsFromDB();
+    this.retrieveAccountsFromEth();
+    this.setProviders();
   }
 
   ngOnInit(){}
@@ -48,23 +52,23 @@ export class Web3Service implements OnInit {
       // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
       this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
     }
-
-    this.retrieveAccounts();
-    this.setProviders();
+    
   }
 
-  updateBalance(account: account) {
-    this.web3.eth.getBalance(account.address, (err, val) => {
-      if (err != null) {
-        alert('There was an error fetching balance of account ' + account.address + ': ' + err);
-        return;
+  retrieveAccountsFromDB() {
+
+    this.neDBService.getAccounts().then(val => {
+      this.accounts = val;
+      for(let acc of this.accounts) {
+        this.channels.set(acc.address, []);
+        this.updateBalance(acc);
       }
-      account.balance = this.web3.utils.fromWei(val.toString());
-      this.updateAccountSource(account, true);
+    }).catch(e => {
+      console.log(e);
     });
   }
 
-  retrieveAccounts() {
+  retrieveAccountsFromEth() {
     this.web3.eth.getAccounts((err, accs) => {
       if (err != null) {
         alert('There was an error fetching your accounts.');
@@ -82,9 +86,19 @@ export class Web3Service implements OnInit {
             alert('There was an error fetching balance of account ' + acc + ': ' + err);
             return;
           }
-          let tmp = new account(acc, this.web3.utils.fromWei(val.toString()));
-          this.channels.set(acc, [])
-          this.updateAccountSource(tmp);
+
+          let found = false;
+
+          for (let v of this.accounts)
+            if (v.address == acc)
+              found = true;
+
+          if (!found) {
+            let tmp = new account(acc, this.web3.utils.fromWei(val.toString()));
+            this.channels.set(acc, []);
+            this.updateAccountSource(tmp);
+          }
+
         });
       }
 
@@ -102,11 +116,11 @@ export class Web3Service implements OnInit {
 
   }
 
-  channelProcessedEventFar(self, from) {
+  channelProcessedEventFar(self) {
     this.Factory.deployed()
       .then((instance) => {
         
-        let ev = instance.channelProcessed({ FarEnd: self }, { fromBlock: from});
+        let ev = instance.channelProcessed({ FarEnd: self.address }, { fromBlock: self.lastBlockScr + 1 });
         
         ev.watch((err, res) => {
           if (err != null) {
@@ -114,8 +128,8 @@ export class Web3Service implements OnInit {
             return;
           }
 
-          console.log("-> New channel far event catched", self)
-
+          console.log("-> New channel far event catched")
+          
           let tmp = new channel(
             res.args.ContractAddrs,
             res.args.NearEnd,
@@ -126,18 +140,20 @@ export class Web3Service implements OnInit {
             0
           )
 
-          this.updateChannelsSource(self, tmp);
+          this.updateLastBlock(res.blockNumber);
+          this.updateBalance(self);
+          this.updateChannelsSource(self.address, tmp);
 
         });
 
       });
   }
 
-  channelProcessedEventNear(self, from) {
+  channelProcessedEventNear(self) {
     this.Factory.deployed()
       .then((instance) => {
 
-        let ev2 = instance.channelProcessed({ NearEnd: self }, { fromBlock: from });
+        let ev2 = instance.channelProcessed({ NearEnd: self.address }, { fromBlock: self.lastBlockScr +1 });
 
         ev2.watch((err, res) => {
           if (err != null) {
@@ -145,8 +161,8 @@ export class Web3Service implements OnInit {
             return;
           }
 
-          console.log("-> New channel near event catched", self)
-
+          console.log("-> New channel near event catched")
+          
           let tmp = new channel(
             res.args.ContractAddrs,
             res.args.NearEnd,
@@ -157,7 +173,9 @@ export class Web3Service implements OnInit {
             0
           )
 
-          this.updateChannelsSource(self, tmp);
+          this.updateLastBlock(res.blockNumber);
+          this.updateBalance(self);
+          this.updateChannelsSource(self.address, tmp);
 
         });
 
@@ -176,11 +194,11 @@ export class Web3Service implements OnInit {
       
   }
 
-  channelAcceptedEvent(self, channel: channel, from): any {
+  channelAcceptedEvent(self, channel: channel): any {
 
     let instance = this.Channel.at(channel.address);
-
-    let evt = instance.channelAccepted({}, { fromBlock: from });
+    
+    let evt = instance.channelAccepted({}, { fromBlock: channel.lastBlockScr +1 });
     
     evt.watch((error, result) => {
       if (error != null) {
@@ -194,6 +212,7 @@ export class Web3Service implements OnInit {
       channel.accepted = true;
       channel.farEndValue = this.web3.utils.fromWei(result.args.farEndValue.toString());
 
+      this.updateLastBlock(result.blockNumber);
       this.updateChannelsSource(self, channel, true);
       
     });
@@ -215,8 +234,6 @@ export class Web3Service implements OnInit {
   async updateState(contract, self, updateParameters: updateParams): Promise<any> {
     let instance = await this.Channel.at(contract);
 
-    console.log(updateParameters);
-
     return instance.updateState(
       updateParameters.end_chann, updateParameters.values_id,
       updateParameters.v, updateParameters.r_s,
@@ -229,10 +246,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  updateStateEvent(self, channel: channel, from): any {
+  updateStateEvent(self, channel: channel): any {
     let instance = this.Channel.at(channel.address);
-
-    let ev  = instance.stateUpdated({}, {fromBlock: from});
+    
+    let ev  = instance.stateUpdated({}, {fromBlock: channel.lastBlockScr +1 });
     
     ev.watch((err, res) => {
       if(err != null) {
@@ -252,7 +269,7 @@ export class Web3Service implements OnInit {
         channel.farEndValue = this.web3.utils.fromWei(res.args.senderValue.toString());
       }
       
-
+      this.updateLastBlock(res.blockNumber);
       this.updateChannelsSource(self, channel, true);
     });
 
@@ -260,10 +277,10 @@ export class Web3Service implements OnInit {
 
   }
 
-  randomShowedEvent(self, channel: channel, from) {
+  randomShowedEvent(self, channel: channel) {
     let instance = this.Channel.at(channel.address);
-
-    let ev = instance.rsShownAndUsed({} ,{fromBlock: from} )
+    
+    let ev = instance.rsShownAndUsed({} ,{fromBlock: channel.lastBlockScr +1} )
     
     ev.watch((err, res) => {
       if (err != null) {
@@ -271,12 +288,9 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      console.log(res.args);
-
       channel.getRsShowed(res.args.random);
-
-      console.log(channel)
-
+      
+      this.updateLastBlock(res.blockNumber);
       this.updateChannelsSource(self, channel, true);
     });
   }
@@ -296,11 +310,11 @@ export class Web3Service implements OnInit {
     );
   }
 
-  disputeStateEvent(self, channel: channel, from) {
+  disputeStateEvent(self, channel: channel) {
 
     let instance = this.Channel.at(channel.address);
 
-    let ev = instance.disputeAccepted({}, {fromBlock: from})
+    let ev = instance.disputeAccepted({}, {fromBlock: channel.lastBlockScr +1})
     
     ev.watch((error, result) => {
       if (error != null) {
@@ -312,6 +326,7 @@ export class Web3Service implements OnInit {
 
       channel.id = result.args.currentId;
 
+      this.updateLastBlock(result.blockNumber);
       this.updateChannelsSource(self, channel, true);
 
     });
@@ -330,10 +345,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  channelCloseRequestEvent(self, channel: channel, from) {
+  channelCloseRequestEvent(self, channel: channel) {
     let instance = this.Channel.at(channel.address);
-
-    let ev = instance.closeRequest({}, {fromBlock: from})
+    
+    let ev = instance.closeRequest({}, {fromBlock: channel.lastBlockScr +1})
     
     ev.watch((err, res) => {
       if (err != null) {
@@ -341,8 +356,10 @@ export class Web3Service implements OnInit {
         return;
       }
 
+      this.updateLastBlock(res.blockNumber);
       console.log("Close request from " + res.args.end + " catched: " + res.args.closeChange);
 
+      //this.updateChannelsSource(self, channel, true);
     });
 
   }
@@ -358,10 +375,10 @@ export class Web3Service implements OnInit {
     );
   }
 
-  channelCloseEvent(self, channel: channel, from) {
+  channelCloseEvent(self, channel: channel) {
     let instance = this.Channel.at(channel.address);
 
-    let ev = instance.channelClosed({}, {fromBlock: from})
+    let ev = instance.channelClosed({}, {fromBlock: channel.lastBlockScr +1})
     
     ev.watch((err, res) => {
       if (err != null) {
@@ -372,10 +389,11 @@ export class Web3Service implements OnInit {
       channel.setClosed();
       channel.nearEndValue = this.web3.utils.fromWei(res.args.nearEndFinalValue.toString());
       channel.farEndValue = this.web3.utils.fromWei(res.args.farEndFinalValue.toString());
-      channel.id = res.args.finalId;
+      channel.id = res.args.finalId
 
-      console.log("-> Close event catched", channel);
+      console.log("-> Close event catched");
 
+      this.updateLastBlock(res.blockNumber);
       this.updateChannelsSource(self, channel, true);
     });
 
@@ -386,24 +404,31 @@ export class Web3Service implements OnInit {
       this.accounts.forEach((item, index) => {
         if (item.address == account.address) {
           this.accounts[index] = account;
+          this.neDBService.updateAccount(account);
           this.accountsSource.next(this.accounts);
         }
       });
     } else {
       this.accounts.push(account);
+      this.neDBService.insertAccount(account);
       this.accountsSource.next(this.accounts);
     }
 
   }
 
-  updateChannelsSource(account: any, channel: channel, modify = false) {
+  updateChannelsSource(account: any, channel: channel, modify = false, inDb = false) {
 
     if (modify) {
 
       this.channels.get(account).forEach((item, index) => {
-        if (item.address == channel.address)
+        if (item.address == channel.address) {
           this.channels.get(account)[index] = channel;
+          this.neDBService.updateChannel(account, channel);
+        }
       });
+
+    } else if(inDb) {
+      this.channels.get(account).push(channel);
 
     } else if (!this.channels.get(account).includes(channel)) {
       let found = false;
@@ -413,15 +438,42 @@ export class Web3Service implements OnInit {
           found = true;
       });
 
-      if (!found)
+      if (!found) {
         this.channels.get(account).push(channel);
+        this.neDBService.insertChannel(account, channel);
+      }
     }
 
 
     this.channelsSource.next(this.channels);
   }
 
+  updateBalance(account: account) {
+    this.web3.eth.getBalance(account.address, (err, val) => {
+      if (err != null) {
+        alert('There was an error fetching balance of account ' + account.address + ': ' + err);
+        return;
+      }
+      account.balance = this.web3.utils.fromWei(val.toString());
+      this.updateAccountSource(account, true);
+    });
+  }
+
   //Utils
+
+  updateLastBlock(lastBlockScrutinized) {
+    for(let acc of this.accounts) {
+      acc.lastBlockScr = lastBlockScrutinized;
+      this.neDBService.updateAccount(acc);
+
+      let channs = this.channels.get(acc.address);
+
+      for(let chann of channs) {
+        chann.lastBlockScr = lastBlockScrutinized;
+        this.neDBService.updateChannel(acc.address, chann);
+      }
+    }
+  }
 
   sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));

@@ -126,6 +126,7 @@ export class OperationComponent implements OnInit, OnDestroy {
       this.web3Service.updateState(this.channel.address, this.account.address, params).then(result => {
         if (result.receipt.status == 1) {
           this.channel.paramToChann(params);
+          this.web3Service.updateBalance(this.account);
           this.setStatus('Transaction complete!', 'update');
           this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], { relativeTo: this.route }))
         }
@@ -180,6 +181,7 @@ export class OperationComponent implements OnInit, OnDestroy {
       this.web3Service.disputeState(this.channel.address, this.account.address, params).then(result => {
         if (result.receipt.status == 1) {
           this.channel.paramToChann(params);
+          this.web3Service.updateBalance(this.account);
           this.setStatus('Transaction complete!', 'dispute');
           this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], { relativeTo: this.route }))
         }

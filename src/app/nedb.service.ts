@@ -13,18 +13,8 @@ export class NedbService implements OnInit {
 
   constructor() { 
 
-    console.log(">> Load");
     this.loadDbs();
 
-
-    /* Delete me please
-    console.log(">> Insert");
-    this.insertDummy();
-    console.log(">> Update");
-    this.updateDummy();
-    console.log(">> Delete");
-    this.deleteDummy();
-    */
   }
 
   ngOnInit() {}
@@ -41,96 +31,13 @@ export class NedbService implements OnInit {
       if(err)
         console.log("Unique violated by one or more objects in db: ", err);
     });
-    this.db.channels.ensureIndex({ fieldName: 'channel.address', unique: true }, (err) => {
+    /*this.db.channels.ensureIndex({ fieldName: 'channel.address', unique: true }, (err) => {
       if(err)
         console.log("Unique violated by one or more objects in db: ", err);
-    });
-
-    // Delete me please
-    this.getAccounts().then(val => {
-      for(let v of val)
-        console.log("Get Accounts: ", v, typeof(v));
-    }).catch(e => {
-      console.log("Get Accounts Error: ",e);
-    });
-
-    this.getChannels('0x0').then(val => {
-      for (let v of val)
-        console.log("Get Channels: ", v, typeof (v));
-    }).catch(e => {
-      console.log("Get Channels Error: ",e);
-    });
-    // Delete end
+    });*/
 
   }
 
-  // Delete me plase
-  insertDummy() {
-    
-    let chann = new channel('0x1','0x1','0x2','1','12','4','8');
-    let acc = new account('0x4','0');
-
-    this.insertAccount(acc);
-    this.insertChannel('0x0', chann);
-
-    this.getAccounts().then(val => {
-      for (let v of val)
-        console.log("Get Accounts: ", v, typeof (v));
-    }).catch(e => {
-      console.log("Get Accounts Error: ", e);
-    });
-
-    this.getChannels('0x0').then(val => {
-      for (let v of val)
-        console.log("Get Channels: ", v, typeof (v));
-    }).catch(e => {
-      console.log("Get Channels Error: ", e);
-    });
-
-  }
-
-  //Delete me please
-  deleteDummy() {
-    this.deleteAccount('0x4');
-    this.deleteChannel('0x1');
-
-    this.getAccounts().then(val => {
-      for (let v of val)
-        console.log("Get Accounts: ", v, typeof (v));
-    }).catch(e => {
-      console.log("Get Accounts Error: ", e);
-    });
-
-    this.getChannels('0x0').then(val => {
-      for (let v of val)
-        console.log("Get Channels: ", v, typeof (v));
-    }).catch(e => {
-      console.log("Get Channels Error: ", e);
-    });
-  }
-
-  //Delete me please
-  updateDummy() {
-    let chann = new channel('0x1', '0xa', '0xb', 'c', 'd', 'e', 'f');
-    let acc = new account('0x4', '1000');
-
-    this.updateAccount(acc);
-    this.updateChannel('0x0', chann);
-
-    this.getAccounts().then(val => {
-      for (let v of val)
-        console.log("Get Accounts: ", v, typeof (v));
-    }).catch(e => {
-      console.log("Get Accounts Error: ", e);
-    });
-  
-    this.getChannels('0x0').then(val => {
-      for (let v of val)
-        console.log("Get Channels: ", v, typeof (v));
-    }).catch(e => {
-      console.log("Get Channels Error: ", e);
-    });
-  }
 
   async getAccount(address): Promise<any> {
     try {
@@ -235,7 +142,7 @@ export class NedbService implements OnInit {
         return;
       }
 
-      console.log("Insert Account: ", newDoc);
+      //console.log("Insert Account: ", newDoc);
     });
   }
 
@@ -246,7 +153,7 @@ export class NedbService implements OnInit {
         return;
       }
 
-      console.log("Insert Channel: ", newDoc);
+      //console.log("Insert Channel: ", newDoc);
     });
   }
 
@@ -257,7 +164,7 @@ export class NedbService implements OnInit {
         return;
       }
 
-      console.log("NumRemoved Account: ", numRemoved);
+      //console.log("NumRemoved Account: ", numRemoved);
     });
   }
 
@@ -268,18 +175,18 @@ export class NedbService implements OnInit {
         return;
       }
 
-      console.log("NumRemoved Channel: ", numRemoved);
+      //console.log("NumRemoved Channel: ", numRemoved);
     });
   }
 
   updateChannel(account, channel: channel, upsert?) {
-    this.db.channels.update({ "channel.address": channel.address }, { account: account, channel: channel }, upsert || {}, (err, numReplaced) => {
+    this.db.channels.update({ "channel.address": channel.address, "account": account }, { account: account, channel: channel }, upsert || {}, (err, numReplaced) => {
       if (err) {
         console.log("Error Update Channel ", err);
         return;
       }
 
-      console.log("NumReplaced Channel: ", numReplaced);
+      //console.log("NumReplaced Channel: ", numReplaced);
     });
   }
 
@@ -290,11 +197,11 @@ export class NedbService implements OnInit {
         return;
       }
 
-      console.log("NumReplaced Account: ", numReplaced);
+      //console.log("NumReplaced Account: ", numReplaced);
     });
   }
 
-  //Define find as promise not callback
+  //Define finds as promises not callbacks
 
   findOne(db, query): Promise<any> {
     return new Promise((resolve, reject) => {
