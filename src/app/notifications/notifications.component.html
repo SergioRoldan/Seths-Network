@@ -18,8 +18,8 @@
         </td>
       </thead>
       <tbody>
-        <tr class="alert round" [ngClass]="{'alert-info': notf.parameters == 'info', 'alert-success': notf.parameters == 'success'}" 
-          *ngFor="let notf of notifications" [class.highlighted]="selectedNotifications.includes(notf)" (click)="selectNotification(notf)">
+        <tr class="alert " [ngClass]="{'alert-info': notf.parameters == 'info', 'alert-success': notf.parameters == 'success', 'highlighted': selectedNotifications.includes(notf)}" 
+          *ngFor="let notf of notifications" (click)="selectNotification(notf)">
           
           <td>
             {{notf.origin}}
@@ -66,7 +66,7 @@
         </td>
       </thead>
       <tbody>
-        <tr *ngFor="let err of errors" class="alert round" [ngClass]="{'alert-warning': err.object == 'warning', 'alert-danger': err.object == 'danger'}"
+        <tr *ngFor="let err of errors" class="alert " [ngClass]="{'alert-warning': err.object == 'warning', 'alert-danger': err.object == 'danger'}"
           [class.highlighted]="selectedErrors.includes(err)" (click)="selectError(err)">
           <td>
             {{err.origin}}

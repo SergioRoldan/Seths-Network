@@ -8,6 +8,7 @@
 
 th, td {
     border-bottom: 1px solid #ddd;
+    border-radius: 10px !important;
     padding: 15px;
     text-align: left;
 }
@@ -19,10 +20,6 @@ th, td {
 
 .but{
   margin-right: 5px !important;
-}
-
-.round {
-  border-radius: 10px !important;
 }
 
 .blue {
