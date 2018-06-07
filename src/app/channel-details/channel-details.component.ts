@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Web3Service } from '../web3.service';
 import { account } from '../../util/account';
 import { canBeNumber} from '../../util/validation';
+import { NotificationsService } from '../notifications.service';
+import { notification } from '../../util/notification';
 
 @Component({
   selector: 'app-channel-details',
@@ -25,7 +27,8 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
 
   now: any;
 
-  constructor(private route: ActivatedRoute, private web3Service: Web3Service, private router: Router) {
+  constructor(private route: ActivatedRoute, private web3Service: Web3Service, private router: Router
+    , private notificationsService: NotificationsService) {
     this.now = Date.now();
    }
 
@@ -69,6 +72,10 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
         this.setStatus('Transaction complete!');
         this.channel.accepted = true;
         this.web3Service.updateBalance(this.account);
+
+        let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
+        let not = new notification('Channel details Component', 'Accept transaction succesfully executed '+ this.channel.address + ' at '+ this.account.address, 'success', objects)
+        this.notificationsService.addNotificationsSource(not);
       }
       else if (result.receipt.status == 0)
         this.setStatus('Error accepting channel, EVM state reverted.');
@@ -82,6 +89,10 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
       if (result.receipt.status == 1) {
         this.setStatus('Transaction complete!', 'more');
         this.web3Service.updateBalance(this.account);
+
+        let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
+        let not = new notification('Channel details Component', 'Close transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
+        this.notificationsService.addNotificationsSource(not);
       } else if(result.receipt.status == 0) 
         this.setStatus('Error closing the channel, EVM state reverted.', 'more');
     }).catch(error => {
@@ -95,6 +106,10 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
         this.setStatus('Transaction complete!', 'more');
         this.channel.closed = true;
         this.web3Service.updateBalance(this.account);
+
+        let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
+        let not = new notification('Channel details Component', 'Unlock funds transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
+        this.notificationsService.addNotificationsSource(not);
       } else if (result.receipt.status == 0)
         this.setStatus('Error unlocking the channel, EVM state reverted.', 'more');
     }).catch(error => {

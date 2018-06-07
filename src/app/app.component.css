@@ -23,7 +23,15 @@ th, td {
 tr:hover {background-color: #e0e0e0;}
 
 .rel {
-  position: relative;
-  float: right;
-  color: rgb(194, 49, 49);
+  position: relative !important;
+  float: right !important;
+  color: rgb(194, 49, 49) !important;
+  margin-top: 105px !important;
+  padding-top: 75px !important;
+}
+
+.fixed {
+  width: 80% !important;
+  position: relative !important;
+  float: left !important;
 }

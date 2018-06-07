@@ -22,7 +22,6 @@ export class NotificationsComponent implements OnInit {
   ngOnInit() {
     this.notificationsService.errors$.subscribe(errors => {
       this.errors = errors;
-      console.log(errors);
     });
     this.notificationsService.notifications$.subscribe(notifications => this.notifications = notifications);
   }
@@ -91,6 +90,16 @@ export class NotificationsComponent implements OnInit {
     this.notificationsService.removeNotificationsSource(this.selectedNotifications);
     this.selectedErrors = [];
     this.selectedNotifications = [];
+  }
+
+  goNotificator(notification:notification) {
+    if(notification.objects != null) {
+      this.notificationsService.removeNotificationsSource([notification]);
+      this.router.navigate([notification.objects]);
+    } else {
+      alert("Unable to redirect you to the source of this notification")
+    }
+    
   }
 
 }

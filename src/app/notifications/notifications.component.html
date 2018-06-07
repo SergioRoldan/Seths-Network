@@ -1,103 +1,116 @@
-<div class="container center" *ngIf="notifications != null && notifications.length > 0">
+<div class="container">
+  <div class="container center" *ngIf="notifications != null && notifications.length > 0">
 
-  <h5 class="title is-4"> Notifications</h5>
-  <table>
-    <thead>
-      <td>
-        <b>Origin</b>
-      </td>
-      <td>
-        <b>Message</b>
-      </td>
-      <td>
-        <b>Parameters</b>
-      </td>
-    </thead>
-    <tbody>
-      <tr class="alert" [class.alert-info]="notf.parameters == info" [class.alert-success]="notf.parameters == success" 
-        *ngFor="let notf of notifications" [class.highlighted]="selectedNotifications.includes(notf)" (click)="selectNotification(notf)">
-        
+    <h5 class="title is-4"> Notifications</h5>
+    <table>
+      <thead>
         <td>
-          {{notf.origin}}
+          <b>Origin</b>
         </td>
         <td>
-          {{notf.message}}
+          <b>Message</b>
         </td>
         <td>
-          {{notf.parameters}}
+          <b>Parameters</b>
         </td>
-        
-      </tr>
-    </tbody>
-  </table>
-  <button (click)="selectNotifications()" class="button is-primary">
-    Select all Notifications
-  </button>
-  <button (click)="deleteNotifications()" [disabled]="selectedNotifications.length == 0" class="button is-primary">
-    Delete selected Notifications
-  </button>
+        <td>
+          <b>Go</b>
+        </td>
+      </thead>
+      <tbody>
+        <tr class="alert round" [ngClass]="{'alert-info': notf.parameters == 'info', 'alert-success': notf.parameters == 'success'}" 
+          *ngFor="let notf of notifications" [class.highlighted]="selectedNotifications.includes(notf)" (click)="selectNotification(notf)">
+          
+          <td>
+            {{notf.origin}}
+          </td>
+          <td>
+            {{notf.message}}
+          </td>
+          <td>
+            {{notf.parameters}}
+          </td>
+          <td>
+            <button (click)="goNotificator(notf)" class="button is-primary"> Check </button>
+          </td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <button (click)="selectNotifications()" class="button but is-primary">
+      Select all Notifications
+    </button>
+    <button (click)="deleteNotifications()" [disabled]="selectedNotifications.length == 0" class="button but is-primary">
+      Delete selected Notifications
+    </button>
 
+  </div>
+
+  <br>
+
+  <div class="container center" *ngIf="errors != null && errors.length > 0">
+
+    <h5 class="title is-4"> Errors/Warnings</h5>
+
+    <table>
+      <thead>
+        <td>
+          <b>Origin</b>
+        </td>
+        <td>
+          <b>Message</b>
+        </td>
+        <td>
+          <b>Extra</b>
+        </td>
+      </thead>
+      <tbody>
+        <tr *ngFor="let err of errors" class="alert round" [ngClass]="{'alert-warning': err.object == 'warning', 'alert-danger': err.object == 'danger'}"
+          [class.highlighted]="selectedErrors.includes(err)" (click)="selectError(err)">
+          <td>
+            {{err.origin}}
+          </td>
+          <td>
+            {{err.message}}
+          </td>
+          <td>
+            {{err.object}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <button (click)="selectErrors()" class="button is-primary but">
+      Select all Errors
+    </button>
+    <button (click)="deleteErrors()" [disabled]="selectedErrors.length == 0" class="button is-primary but">
+      Delete selected Errors
+    </button>
+
+  </div>
+
+  <br>
+
+  <div *ngIf="errors != null && notifications != null && errors.length != 0 && notifications.length != 0">
+    <button (click)="selectAll()" class="button is-primary but">
+      Select all
+    </button>
+    <button (click)="deleteAll()" class="button is-primary but">
+      Delete all
+    </button>
+    <button (click)="deleteAllSelected()" [disabled]="selectedErrors.length + selectedNotifications.length == 0" class="button but is-primary">
+      Delete all selected
+    </button>
+  </div>
+
+  <div class="container center" *ngIf="errors != null && notifications != null && errors.length == 0 && notifications.length == 0">
+    <p><b>Unfortunately there's nothing new to be checked :(</b></p>
+  </div>
+
+  <br>
+
+  <button (click)="goBack()" class="button is-primary">
+    Go Root
+  </button>
 </div>
-
-<br>
-
-<div class="container center" *ngIf="errors != null && errors.length > 0">
-
-  <h5 class="title is-4"> Errors/Warnings</h5>
-  {{errors.length}}
-  {{errors}}
-  <table>
-    <thead>
-      <td>
-        <b>Origin</b>
-      </td>
-      <td>
-        <b>Message</b>
-      </td>
-      <td>
-        <b>Extra</b>
-      </td>
-    </thead>
-    <tbody>
-      <tr *ngFor="let err of errors" class="alert" [class.alert-warning]="err.object == warning" [class.alert-danger]="err.object == danger"
-        [class.highlighted]="selectedErrors.includes(err)" (click)="selectError(err)">
-        <td>
-          {{err.origin}}
-        </td>
-        <td>
-          {{err.message}}
-        </td>
-        <td>
-          {{err.object}}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <button (click)="selectErrors()" class="button is-primary">
-    Select all Errors
-  </button>
-  <button (click)="deleteErrors()" [disabled]="selectedErrors.length == 0" class="button is-primary">
-    Delete selected Errors
-  </button>
-
-</div>
-
-<div *ngIf="errors != null && notifications != null && errors.length != 0 && notifications.length != 0">
-  <button (click)="selectAll()" class="button is-primary">
-    Select all
-  </button>
-  <button (click)="deleteAll()" class="button is-primary">
-    Delete all
-  </button>
-  <button (click)="deleteAllSelected()" [disabled]="selectedErrors.length + selectedNotifications.length == 0" class="button is-primary">
-    Delete all selected
-  </button>
-</div>
-
-<div class="container center" *ngIf="errors != null && notifications != null && errors.length == 0 && notifications.length == 0">
-  <p><b>Unfortunately there's nothing new to be checked :(</b></p>
-</div>
-
-<button (click)="goBack()" class="button is-primary">
-  Go Root
-</button>

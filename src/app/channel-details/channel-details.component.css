@@ -10,3 +10,7 @@ p {
 .margin {
   margin: 3px;
 }
+
+.but{
+  margin-right: 5px !important;
+}

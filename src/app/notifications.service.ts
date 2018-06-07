@@ -12,10 +12,10 @@ export class NotificationsService implements OnInit{
   notifications: notification[] = [];
   total: number = 0;
 
+  //Define behavior subjects and observables
   private errorsSource = new BehaviorSubject<error[]>(this.errors);
   private notificationsSource = new BehaviorSubject<notification[]>(this.notifications);
   private totalSource = new BehaviorSubject<number>(this.total);
-
   errors$ = this.errorsSource.asObservable();
   notifications$ = this.notificationsSource.asObservable();
   total$ = this.totalSource.asObservable();
@@ -23,6 +23,8 @@ export class NotificationsService implements OnInit{
   constructor() {}
 
   ngOnInit() {}
+
+  //Add and remove object/s to the error and notifications source to fire a new event in the observables
 
   addErrorSource(error: error) {
     this.errors.push(error);

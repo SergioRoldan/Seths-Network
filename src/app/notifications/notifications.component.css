@@ -17,6 +17,14 @@ th, td {
   margin: 0 auto;
 }
 
+.but{
+  margin-right: 5px !important;
+}
+
+.round {
+  border-radius: 10px !important;
+}
+
 .blue {
   background: rgb(40, 101, 192);
 }

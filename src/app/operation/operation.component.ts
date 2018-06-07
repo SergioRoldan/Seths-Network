@@ -5,6 +5,8 @@ import { canBeAddress, canBeDays, canBeNumber, canBeSignature } from '../../util
 import { account } from '../../util/account';
 import { channel } from '../../util/channel';
 import { updateParams } from '../../util/updateParams';
+import { NotificationsService } from '../notifications.service';
+import { notification } from '../../util/notification';
 
 @Component({
   selector: 'app-operation',
@@ -43,7 +45,8 @@ export class OperationComponent implements OnInit, OnDestroy {
   canBeNumber = canBeNumber;
   canBeSignature = canBeSignature;
 
-  constructor(public router: Router, private route: ActivatedRoute, private web3Service: Web3Service) { }
+  constructor(public router: Router, private route: ActivatedRoute, private web3Service: Web3Service, 
+    private notificationsService:NotificationsService) { }
 
   ngOnInit() {
     this.subAccount = this.route.parent.params.subscribe(params => this.account = JSON.parse(params['account']));
@@ -74,7 +77,12 @@ export class OperationComponent implements OnInit, OnDestroy {
       if (result.receipt.status == 1) {
         this.setStatus('Transaction complete!', 'create');
         this.web3Service.updateBalance(this.account);
-        this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], {relativeTo: this.route}))
+
+        let objects = 'accounts/' + JSON.stringify(this.account);
+        let not = new notification('Channel details Component', 'Create channel succesfully executed at ' + this.account.address, 'success', objects)
+        this.notificationsService.addNotificationsSource(not);
+
+        this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], {relativeTo: this.route}));
       }
       else if (result.receipt.status == 0)
         this.setStatus('Error creating channel, EVM state reverted', 'create');
@@ -128,6 +136,11 @@ export class OperationComponent implements OnInit, OnDestroy {
           this.channel.paramToChann(params);
           this.web3Service.updateBalance(this.account);
           this.setStatus('Transaction complete!', 'update');
+
+          let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
+          let not = new notification('Channel details Component', 'Update state transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
+          this.notificationsService.addNotificationsSource(not);
+
           this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], { relativeTo: this.route }))
         }
         else if (result.receipt.status == 0)
@@ -183,6 +196,11 @@ export class OperationComponent implements OnInit, OnDestroy {
           this.channel.paramToChann(params);
           this.web3Service.updateBalance(this.account);
           this.setStatus('Transaction complete!', 'dispute');
+
+          let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
+          let not = new notification('Channel details Component', 'Dispute state transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
+          this.notificationsService.addNotificationsSource(not);
+
           this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], { relativeTo: this.route }))
         }
         else if (result.receipt.status == 0)

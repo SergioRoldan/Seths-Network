@@ -1,7 +1,8 @@
-<div class="container center" *ngIf="channels != null && channels.length > 0">
+<div class="container" *ngIf="channels != null && channels.length > 0">
 
   <h5 class="title is-4"> Channels</h5>
   <input [(ngModel)]="searchText" placeholder="0x275e1..." class="width">
+  <br>
   <table>
     <thead>
       <td>
@@ -32,3 +33,5 @@
 <br>
 
 <button (click)="goCreate()" class="button is-primary"> Create channel </button>
+
+<br>
