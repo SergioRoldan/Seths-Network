@@ -74,7 +74,7 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
         this.web3Service.updateBalance(this.account);
 
         let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
-        let not = new notification('Channel details Component', 'Accept transaction succesfully executed '+ this.channel.address + ' at '+ this.account.address, 'success', objects)
+        let not = new notification('Channel Details', 'Accept transaction succesfully executed '+ this.channel.address + ' at '+ this.account.address, 'success', objects)
         this.notificationsService.addNotificationsSource(not);
       }
       else if (result.receipt.status == 0)
@@ -91,7 +91,7 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
         this.web3Service.updateBalance(this.account);
 
         let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
-        let not = new notification('Channel details Component', 'Close transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
+        let not = new notification('Channel Details', 'Close transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
         this.notificationsService.addNotificationsSource(not);
       } else if(result.receipt.status == 0) 
         this.setStatus('Error closing the channel, EVM state reverted.', 'more');
@@ -108,7 +108,7 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
         this.web3Service.updateBalance(this.account);
 
         let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
-        let not = new notification('Channel details Component', 'Unlock funds transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
+        let not = new notification('Channel Details', 'Unlock funds transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
         this.notificationsService.addNotificationsSource(not);
       } else if (result.receipt.status == 0)
         this.setStatus('Error unlocking the channel, EVM state reverted.', 'more');

@@ -79,7 +79,7 @@ export class OperationComponent implements OnInit, OnDestroy {
         this.web3Service.updateBalance(this.account);
 
         let objects = 'accounts/' + JSON.stringify(this.account);
-        let not = new notification('Channel details Component', 'Create channel succesfully executed at ' + this.account.address, 'success', objects)
+        let not = new notification('Operation', 'Create channel succesfully executed at ' + this.account.address, 'success', objects)
         this.notificationsService.addNotificationsSource(not);
 
         this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], {relativeTo: this.route}));
@@ -138,7 +138,7 @@ export class OperationComponent implements OnInit, OnDestroy {
           this.setStatus('Transaction complete!', 'update');
 
           let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
-          let not = new notification('Channel details Component', 'Update state transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
+          let not = new notification('Operation', 'Update state transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
           this.notificationsService.addNotificationsSource(not);
 
           this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], { relativeTo: this.route }))
@@ -198,7 +198,7 @@ export class OperationComponent implements OnInit, OnDestroy {
           this.setStatus('Transaction complete!', 'dispute');
 
           let objects = 'accounts/' + JSON.stringify(this.account) + '/channels/' + JSON.stringify(this.channel);
-          let not = new notification('Channel details Component', 'Dispute state transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
+          let not = new notification('Operation', 'Dispute state transaction succesfully executed ' + this.channel.address + ' at ' + this.account.address, 'success', objects)
           this.notificationsService.addNotificationsSource(not);
 
           this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], { relativeTo: this.route }))

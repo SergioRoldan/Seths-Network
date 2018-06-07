@@ -79,10 +79,8 @@ export class NotificationsComponent implements OnInit {
   }
 
   deleteAll() {
-    this.notificationsService.removeErrorSource(this.errors);
-    this.notificationsService.removeNotificationsSource(this.notifications);
-    this.selectedErrors = [];
-    this.selectedNotifications = [];
+    this.selectAll();
+    this.deleteAllSelected();
   }
 
   deleteAllSelected() {

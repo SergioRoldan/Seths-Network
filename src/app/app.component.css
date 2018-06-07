@@ -18,6 +18,7 @@ th, td {
 
 .blue {
   background: rgb(40, 101, 192);
+  height: 150px;
 }
 
 tr:hover {background-color: #e0e0e0;}
@@ -25,8 +26,9 @@ tr:hover {background-color: #e0e0e0;}
 .rel {
   position: relative !important;
   float: right !important;
-  text-align: center !important;
-  align-self: center !important;
+  margin-top: 13px !important;
+  height: 44px;
+  width: 144px;
 
 }
 
