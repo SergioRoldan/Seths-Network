@@ -1,7 +1,10 @@
+//Compiler version
 pragma solidity ^0.4.23;
 
+//Import cryptohandler library
 import { CryptoHandler } from "./libraries/CryptoHandler.sol";
 
+//Internal contract expirable to define the live cycle of a channel
 contract Expirable {
     
     uint256 public channelEnd;
@@ -10,21 +13,19 @@ contract Expirable {
         channelEnd = now + (_daysToExpire * 1 days);
     }
     
+    //Modifiers for the live cycle of a channel
     modifier hasNotExpired() {
         require(now <= channelEnd);
         _;
     }
-
     modifier hasNotSettle() {
         require(now <= (channelEnd + 1 days));
         _;
     }
-    
     modifier inSettlementPeriod() {
         require(now > channelEnd && now <= (channelEnd + 1 days));
         _;
     }
-
     modifier hasSettled() {
         require(now > (channelEnd + 1 days));
         _;
@@ -32,6 +33,7 @@ contract Expirable {
 
 }
 
+//Internal contract multiownable to define the two owners of a channel
 contract Multiownable {
     
     address[2] public owners;
@@ -41,24 +43,20 @@ contract Multiownable {
         owners = _owners;
     }
     
+    //Get the other owner of the channel for verifying operations
     function getOtherOwner(address _owner)  internal view returns (address){
-
         if(_owner == owners[0]) 
             return owners[1];
         else if (_owner == owners[1]) 
             return owners[0]; 
-        
         return 0x0;
-
     }
     
+    //Modifiers for the owners of the channel
     modifier onlyOwners(){
-        
         require(msg.sender == owners[0] || msg.sender == owners[1]);
         _;
-
     }
-
     modifier onlyFarEnd(){
         require(msg.sender == owners[1]);
         _;
@@ -66,12 +64,12 @@ contract Multiownable {
     
 }
 
+//Internal contract modifiers to define modifiers and events of the channel related with closed,accepted and disputed situations
 contract Modifiers {
 
+    // Channel accepted, close request and close events
     event channelAccepted(uint256 farEndValue, uint256 totalValue);
-
     event closeRequest(address indexed end, bool closeChange);
-
     event channelClosed(address indexed NearEnd, uint256 nearEndFinalValue, address indexed FarEnd,
     uint256 farEndFinalValue, uint256 finalId);
 
@@ -80,21 +78,19 @@ contract Modifiers {
 
     mapping(address => bool) public disputed;
     
+    //Modifiers related with closed, accepted and disputed situations
     modifier notClosed() {
         require(!closed);
         _;
     }
-
     modifier isAccepted() {
         require(accepted);
         _;
     }
-
     modifier notAccepted(){
         require(!accepted);
         _;
     }
-
     modifier notDisputed(){
         require(disputed[msg.sender] == false);
         _;
@@ -102,15 +98,16 @@ contract Modifiers {
     
 }
 
+//Channel contract inheriting from the previous internal contracts
 contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
+    //Channels events for state update, random shown and dispute accepted situations
     event stateUpdated(address indexed sender, uint256 senderValue, address indexed uploader,
     uint256 uploaderValue, uint256 currentId);
-
     event disputeAccepted(address indexed end, uint256 currentId);
-
     event rsShownAndUsed(bytes32[] randomS, bytes32[] random);
 
+    //Limit number of hash locked transactions on an update or a dispute
     uint16 constant public limit = 251;
  
     struct State {
@@ -124,14 +121,18 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
     mapping(address => bool) public requestedClose;
 
+    //Functions relate with token transfers follow the conditions -> effects -> interaction 
+    //in order to avoid security leaks and double-spend problems
+
+    //Create a channel selfexplanatory
     constructor (address _nearEnd, address _farEnd, uint256 _daysOpen)
         Multiownable([_nearEnd, _farEnd]) Expirable(_daysOpen) public payable {
 
         state.values[_nearEnd] = msg.value;
         channelValue = msg.value;
-
     }
 
+    //Accept channel, selfexplanatory
     function acceptChannel() public payable onlyFarEnd notAccepted hasNotExpired {
 
         accepted = true;
@@ -143,6 +144,7 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
     }
 
+    //Update state of the channel calls handle state and emits and event
     function updateState(
         address[2] _end_chann, uint256[2] _values_id, uint8 _v, bytes32[2] _r_s, 
         bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end
@@ -153,6 +155,7 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
         emit stateUpdated(msg.sender, state.values[msg.sender], _end_chann[0], state.values[getOtherOwner(msg.sender)], state.id);
     }
 
+    //Dispute state of the channel, practically equal to update state with slight modifications
     function disputeState(
         address[2] _end_chann, uint256[2] _values_id, uint8 _v, bytes32[2] _r_s, 
         bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end

@@ -2,6 +2,8 @@
   "name": "angular-truffle-dapp",
   "productName": "Seths Network",
   "version": "1.0.0",
+  "description": "Seths Network for Final Degree Project about Scalability Issues in the Blockchain",
+  "descriptions": "Seths Network for Final Degree Project about Scalability Issues in the Blockchain",
   "main": "main.js",
   "scripts": {
     "ng": "ng",
@@ -15,9 +17,12 @@
     "migrate-eth": "truffle migrate",
     "electron": "electron .",
     "electron-build": "ng build --prod && electron .",
-    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds",
     "package-win": "electron-packager . seths-network --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Seths Network\"",
-    "package-linux": "electron-packager . seths-network --overwrite --asar=true --platform=linux --arch=x64 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds"
+    "package-linux": "electron-packager . seths-network --overwrite --asar=true --platform=linux --arch=x64 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds",
+    "create-win-installer": "node installers/windows/createinstaller.js",
+    "create-installer-mac": "electron-installer-dmg ./release-builds/Seths\\ Network-darwin-x64/Seths\\ Network.app seths-network-app --out=release-builds --overwrite",
+    "create-debian-installer": "electron-installer-debian --src release-builds/seths-network-linux-x64/ --arch amd64 --config debian.json"
   },
   "private": true,
   "dependencies": {
@@ -50,6 +55,8 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^8.9.5",
     "codelyzer": "~4.2.1",
+    "electron-installer-dmg": "^1.0.0",
+    "electron-winstaller": "^2.6.4",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~1.7.1",
