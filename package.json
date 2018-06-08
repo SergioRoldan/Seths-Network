@@ -1,7 +1,7 @@
 {
   "name": "angular-truffle-dapp",
-  "productName": "Ethereum Lightning Network",
-  "version": "alpha@1.0.0",
+  "productName": "Seths Network",
+  "version": "1.0.0",
   "main": "main.js",
   "scripts": {
     "ng": "ng",
@@ -13,7 +13,7 @@
     "electron": "electron .",
     "electron-build": "ng build --prod && electron .",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds",
-    "package-win": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Etherum Lightning Network\"",
+    "package-win": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Seths Network\"",
     "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds"
   },
   "private": true,

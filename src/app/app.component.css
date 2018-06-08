@@ -17,7 +17,7 @@ th, td {
 }
 
 .blue {
-  background: rgb(40, 101, 192);
+  background: rgb(94, 151, 237);
   height: 150px;
 }
 
@@ -36,4 +36,5 @@ tr:hover {background-color: #e0e0e0;}
   width: 80% !important;
   position: relative !important;
   float: left !important;
+  color: white !important;
 }

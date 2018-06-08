@@ -427,7 +427,7 @@ export class Web3Service implements OnInit {
       //Like the rest of the events
       this.updateLastBlock(res.blockNumber);
       let objects = 'accounts/' + JSON.stringify(this.getAccountFromAddress(self)) + '/channels/' + JSON.stringify(channel);
-      let n = new notification('Web3Service', "Close request from " + res.args.end + " catch at " + self.address, 'info', objects);
+      let n = new notification('Web3Service', "Close request from " + res.args.end + " catch at " + self, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
 
       /*

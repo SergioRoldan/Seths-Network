@@ -11,10 +11,7 @@
           <b>Message</b>
         </td>
         <td>
-          <b>Parameters</b>
-        </td>
-        <td>
-          <b>Go</b>
+          <b>Check</b>
         </td>
       </thead>
       <tbody>
@@ -26,9 +23,6 @@
           </td>
           <td>
             {{notf.message}}
-          </td>
-          <td>
-            {{notf.parameters}}
           </td>
           <td>
             <button (click)="goNotificator(notf)" class="button is-primary"> Check </button>
@@ -61,9 +55,6 @@
         <td>
           <b>Message</b>
         </td>
-        <td>
-          <b>Extra</b>
-        </td>
       </thead>
       <tbody>
         <tr *ngFor="let err of errors" class="alert " [ngClass]="{'alert-warning': err.object == 'warning', 'alert-danger': err.object == 'danger'}"
@@ -73,9 +64,6 @@
           </td>
           <td>
             {{err.message}}
-          </td>
-          <td>
-            {{err.object}}
           </td>
         </tr>
       </tbody>
