@@ -62,13 +62,15 @@ Run under: "#npm run "name""
 | create-installer-mac | Generate Mac OS installer | "electron-installer-dmg ./release-builds/Seths\\ Network-darwin-x64/Seths\\ Network.app seths-network-app --out=release-builds --overwrite" |
 | create-debian-installer | Generate Debian installer | "electron-installer-debian --src release-builds/seths-network-linux-x64/ --arch amd64 --config debian.json" | 
 
-!! create-debian-installer doesn't work on Windows distros because electron-installer-debian can't be installed in not unix OS !!
+!! create-debian-installer and create-installer-mac doesn't work on Windows distros because electron-installer-debian and electron-installer-dmg can't be installed in not unix OS !!
 
 Revise package.json to check dependencies and other details
+
 Revise angular.json to check angular properties
+
 Revise truffle.config.js to check truffle configuration
 
-- main.js is the entry point for Electron, revise and modify it commenting or uncommenting line according to your requirements
+Note: main.js is the entry point for Electron, revise and modify it commenting or uncommenting line according to your requirements
 
 Feel free of revise and modify any configuration file under src folder, most of them remain as default
 
@@ -79,10 +81,14 @@ In root dir of the project, in order to create build and dist folders and run th
 - Run Ganache (prefered) or similar (TestRPC, Geth, Parity... allowing RPC calls on port 7545 by default)
 
 - I. To compile and deploy contracts use: "#npm run migrate-eth" or "#truffle migrate" (each time Ganache is relaunched)
+
 - II. Alternatively run: "#npm run compile-eth" or "#truffle compile" and then the previous command (to force contracts compilation and build)
 
+
 - I. To start the client: "#npm run electron-build"
+
 - II. Alternatively to start the client use "#ng serve", point index.html to localhost:4200 (currently pointing to "./") and then "#npm run electron"
+
 - III. Alternatively run "#npm run electron" once the project is built
 
 - IV.1 Alternatively package the app for your distro using "#npm run package-win", "#npm run package-mac" or "#npm run package-linux"
@@ -90,27 +96,35 @@ In root dir of the project, in order to create build and dist folders and run th
 - IV.2 Use the .exe, .dmg or .pak packaged app in release-builds folder according to your distribution 
 (release-builds is created once app is packaged. You can pack the app for any distro using any distro, but the installer creation only will work for your distribution and probably won't for the others, e.g. You must create the Windows installer in a Windows OS, trying to create a macOS installer or Linux installer in a Windows OS fails)
 
-IMPORTANT ! App must be repackaged each time Ganache is restarted because build folder would change. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This should be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet.
+IMPORTANT ! App must be repackaged each time Ganache is restarted because build folder changes. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This should be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet.
 
 ## Project folder distribution
 
 All important files are selfexplanatory or are commented otherwise.
 
 /build: Folder where Truffle creates artifacts for smart contracs once they are compiled and deployed (Doesn't exist before migration)
+
 /contracts: Contains smart contracts for the Seths Network
+
 /dist: Contains angular-electron app build using production flag (Doens't exist before build)
+
 /e2e: Folder created by angular to contain e2e definitions
+
 /installers: Contains the files required to create windows installer
+
 /migrations: Contains the files required to deploy smart contracts using truffle migrate
+
 /node_modules: Contains node modules (Doesn't exist before npm install)
+
 /release-build: Contains executables of the app packages for Windows, Linux and MacOS & an installer for Windows
+
 /src: Contains the source and configuration files of the application
 
 Also:
 - Readme & License
 - Configuration files for truffle, debian-installer, angular, typescript, electron and node
 
-## On Development
+## Usage
 
 You will see the address/es of your node, click on any of them to see its contracts (empty if any has been created) or to create a new one. Click on a contract to interact with it.
 
