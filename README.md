@@ -29,12 +29,15 @@ Install modules in the root of the project using: #npm install
 Include/modify the next line in the following file, otherwise angular won't compile correctly:
 
 'node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js':
+    
     - node: {},
+
     + node: {crypto:true, stream:true},
 
 This solves Angular 6 strip of crypto and stream libraries, which are truffle-contracts library dependencies
 
 If typings.d.ts is not in the project include it with the following code under the src folder:
+
     + declare var require: NodeRequire;
 
 This allows node to generate ts typings for js libraries that doesn't provide them
