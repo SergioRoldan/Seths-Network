@@ -25,6 +25,7 @@ export class channel {
 
     lastBlockScr: number;
 
+    //Conctructor overload to create non-initialized channels
     constructor();
     constructor(address, nearEnd, farEnd, value, endDate, nearEndValue, farEndValue);
     constructor(address?, nearEnd?, farEnd?, value?, endDate?, nearEndValue?, farEndValue?, lastBlockScr = 0, accepted = false, id = 0, closed = false) {
@@ -47,50 +48,54 @@ export class channel {
         this.lastBlockScr = lastBlockScr;
     }
 
+    //Setters
     setAccepted() {
         this.accepted = true;
     }
-
     setClosed() {
         this.closed = true;
     }
-
     updateId(id: any) {
         this.id = id;
     }
-
     addRandomLock(random: any) {
         this.randoms.push(random);
     }
-
     addHashLock(hash: any) {
         this.hashes.push(hash);
     }
 
+    //Get Randoms shown
     getRsShowed(rsShowed: any) {
+        //Check if randoms is empty
         if(this.randoms.length >0) {
+            //If it's not, check that each random hashed in hash
             for (let r of rsShowed) {
                 let index = this.checkRandomHashesInH(r);
                 if (index != -1)
                     this.rsShowed.push(index);
             }
+            //Regenerate hashes consumed by checkRadomHashesInH
             this.generateHashes(this.randoms);
         } else {
+            //If it is, generate hashes
             this.generateHashes(rsShowed);
             this.randoms = rsShowed;
 
+            //Check that each random hashes in hash
             for (let r of rsShowed) {
                 let index = this.checkRandomHashesInH(r);
                 if (index != -1)
                     this.rsShowed.push(index);
             }
-            
+            //Regenerate hashes consumed by checkRadomHashesInH
             this.generateHashes(this.randoms);
             
         }
         
     }
 
+    //Generate hashes from randoms using solidity hashing function sha3 which is a synonim of kecakk256
     generateHashes(randoms: any) {
         this.hashes = [];
 
@@ -102,6 +107,7 @@ export class channel {
         }
     }
 
+    //Check that a random R hashes in H and consumes the hash to increase performance
     checkRandomHashesInH(random: any): any {
         let h = Web3Utils.soliditySha3(
             { t: 'bytes32', v: random}
@@ -120,6 +126,7 @@ export class channel {
         return found;
     }
 
+    //updates the channel according to an update parameters
     paramToChann(param: any) {
         this.hashes = param.hs;
         this.randoms = param.rs;
@@ -128,6 +135,7 @@ export class channel {
         this.rhvals = param.rhVals;
     }
 
+    //Map a js object to channel
     map(object) {
         this.address = object.address;
         this.nearEnd = object.nearEnd;

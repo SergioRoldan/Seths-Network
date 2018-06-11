@@ -28,6 +28,8 @@ export class updateParams {
 
         this.rs = rs;
         this.hs = [];
+
+        //Check if randoms is not empty, and generate hashes in this case
         if(rs.length > 0) {
             this.generateHashes(rs);
             this.ttls = ttls;
@@ -45,6 +47,7 @@ export class updateParams {
             this.rsSigned = rsSigned;
         }
         
+        //Check if signature is null or empty, if it's the case generate the signature
         if(signature == null || signature == '') {
             this.generateSignature().then(res => {
                 signature = res
@@ -54,6 +57,7 @@ export class updateParams {
                 this.v = tmp['v'];
                 this.r_s = [tmp['r'], tmp['s']];
              });
+        //Otherwise parse the signature
         } else {
             let tmp = this.parseSignature(signature);
 
@@ -63,7 +67,9 @@ export class updateParams {
 
     }
 
+    //Generate signature using web3.sign and web3utils solidiy sha3
     generateSignature() {
+        //Signature in case the update has not conditionals
         if(this.hs.length == 0) {
             let hsh = this.web3Utils.soliditySha3(
                 { t: 'uint256', v: this.values_id },
@@ -71,6 +77,7 @@ export class updateParams {
             );
             
             return this.web3.eth.sign(hsh, this.end_chann[0]);
+        //Otherwise include conditional parameters in the signature
         } else {
             console.log(this.hs, this.ttls, this.rhVals, this.ends);
 
@@ -88,6 +95,7 @@ export class updateParams {
         }
     }
 
+    //Parse the signature returned by web3.sign to be send as r - s - v_dec
     parseSignature(signature: any): any {
         
         let sign = signature.substring(2);
@@ -99,6 +107,7 @@ export class updateParams {
         return {'r': r, 's': s, 'v': v_dec};
     }
 
+    //Generate hashes, equal to channel.ts method
     generateHashes(randoms: any) {
         for(let rand of randoms) {
             let h = this.web3Utils.soliditySha3(

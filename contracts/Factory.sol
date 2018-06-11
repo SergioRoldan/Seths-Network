@@ -155,7 +155,7 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
         emit stateUpdated(msg.sender, state.values[msg.sender], _end_chann[0], state.values[getOtherOwner(msg.sender)], state.id);
     }
 
-    //Dispute state of the channel, practically equal to update state with slight modifications
+    //Dispute state of the channel, practically equal to update state but set disputed to true (just in settlement period)
     function disputeState(
         address[2] _end_chann, uint256[2] _values_id, uint8 _v, bytes32[2] _r_s, 
         bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end
@@ -169,6 +169,8 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
     }
 
+    //Handle an state update, requires a well-build update including hash and signature, consistency in the parameters
+    //Updates the parameters and calls checkRHashesInH
     function handleState(
         address[2] _end_chann, uint256[2] _values_id, uint8 _v, bytes32[2] _r_s, 
         bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end
@@ -198,11 +200,16 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
         state.values[msg.sender] = channelValue - _values_id[0];
 
         if(_hs.length > 0) 
-            checkRshashesIn_hs(_rsSigned, _rs, _hs, _ttls, _rhValues, _end);
+            checkRsHashesInHs(_rsSigned, _rs, _hs, _ttls, _rhValues, _end);
 
     }
 
-    function checkRshashesIn_hs(bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, uint256[] _rhValues,  uint8[] _end) internal {
+    //Check for each R in a hash locked transaction if the time to live is still valid and if it hashed in H
+    //Updates the state and emits the R shown
+    function checkRsHashesInHs(
+        bytes32[] _rsSigned, bytes32[] _rs, bytes32[] _hs, uint256[] _ttls, 
+        uint256[] _rhValues,  uint8[] _end
+        ) internal {
         
         uint256 near;
         uint256 far;
@@ -250,6 +257,7 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
 
     }
 
+    //Request a close of the channel, if both parties agree in the closing then the channel closes and unlocks the funds
     function closeChannel(bool _close) public onlyOwners isAccepted notClosed hasNotSettle {
         
         if(_close && requestedClose[getOtherOwner(msg.sender)]) {
@@ -275,6 +283,7 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
         }
     }
 
+    //Unlocks the funds once the channel is settled
     function unlockFunds() public onlyOwners notClosed hasSettled {
 
         closed = true;
@@ -291,25 +300,27 @@ contract ChannelFinal is Multiownable, Expirable, Modifiers {
             
     }
 
+    //Public functions to retrieve each owner value and the state id
     function getStateNear() public view returns (uint256 val) {
         return state.values[owners[0]];
     }
-    
     function getStateFar() public view returns (uint256 val) {
         return state.values[owners[1]];
     }
-    
     function getStateId() public view returns (uint256 val) {
         return state.id;
     }
     
 }
 
+//Factory of channels, smart contract deployed in a known address and main component of the Seths Network on the Blockchain
 contract Factory{
     
+    //Factory event for a new channel
     event channelProcessed(address indexed ContractAddrs, address indexed NearEnd, address indexed FarEnd,
     uint256 channelVal, uint256 endDate);
     
+    //Public payable function to create a channel with a _farEnd to remain open for _daysOpen
     function createChannel(address _farEnd, uint _daysOpen) public payable {
         ChannelFinal channel = (new ChannelFinal).value(msg.value)(msg.sender, _farEnd, _daysOpen);
         emit channelProcessed(channel, msg.sender, _farEnd, channel.channelValue(), channel.channelEnd());

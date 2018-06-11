@@ -7,6 +7,7 @@ export class account {
     channels: channel[];
     lastBlockScr: number;
 
+    //Contructor overload to create non-initialized accounts
     constructor();
     constructor(address, account);
     constructor(address?, balance?) {
@@ -20,6 +21,7 @@ export class account {
         this.channels.push(channel);
     }
 
+    //Map js object to account
     map(object) {
         this.address = object.address;
         this.balance = object.balance;

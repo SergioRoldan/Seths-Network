@@ -20,7 +20,8 @@ module.exports = {
   },
   solc: {
     optimizer: {
-      enabled: true, //enable 200 runs solidity compiler optimization
+      enabled: true,  //enable 200 runs (default value, more runs increase the resultant bytecode) solidity compiler optimization
+                      // at assembly level working with opcodes to reduce the gas usage to the minimum limit, for production purposes
       runs: 200
     }
   }

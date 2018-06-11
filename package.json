@@ -3,7 +3,6 @@
   "productName": "Seths Network",
   "version": "1.0.0",
   "description": "Seths Network for Final Degree Project about Scalability Issues in the Blockchain",
-  "descriptions": "Seths Network for Final Degree Project about Scalability Issues in the Blockchain",
   "main": "main.js",
   "scripts": {
     "ng": "ng",

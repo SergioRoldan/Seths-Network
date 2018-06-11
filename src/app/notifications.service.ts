@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { error } from '../util/error';
 import { notification } from '../util/notification';
 
+//Where the service is injected
 @Injectable({
   providedIn: 'root'
 })
@@ -26,23 +27,27 @@ export class NotificationsService implements OnInit{
 
   //Add and remove object/s to the error and notifications source to fire a new event in the observables
 
+  //Add a single error
   addErrorSource(error: error) {
     this.errors.push(error);
     this.addTotalSource();
     this.errorsSource.next(this.errors);
   }
 
+  //Add a single notification
   addNotificationsSource(notification: notification) {
     this.notifications.push(notification);
     this.addTotalSource();
     this.notificationsSource.next(this.notifications);
   }
 
+  //Increase number of notifications by one
   addTotalSource() {
     this.total++;
     this.totalSource.next(this.total);
   }
 
+  //Remove errors
   removeErrorSource(errors: error[]) {
     for(let e of errors)
       if(this.errors.includes(e)) {
@@ -53,6 +58,7 @@ export class NotificationsService implements OnInit{
     this.errorsSource.next(this.errors);
   }
 
+  //Remove notifications
   removeNotificationsSource(notifications: notification[]) {
     for(let n of notifications)
       if(this.notifications.includes(n)) {
@@ -63,6 +69,7 @@ export class NotificationsService implements OnInit{
     this.notificationsSource.next(this.notifications);
   }
 
+  //Decrease number of notifications by one
   removeTotalSource() {
     this.total--;
     this.totalSource.next(this.total);

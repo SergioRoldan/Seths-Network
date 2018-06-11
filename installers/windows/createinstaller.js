@@ -1,6 +1,7 @@
 const createWindowsInstaller = require('electron-winstaller').createWindowsInstaller
 const path = require('path')
 
+//Promise chain execution
 getInstallerConfig()
     .then(createWindowsInstaller)
     .catch((error) => {
@@ -10,9 +11,11 @@ getInstallerConfig()
 
 function getInstallerConfig() {
     console.log('creating windows installer')
+    //Paths
     const rootPath = path.join('./')
     const outPath = path.join(rootPath, 'release-builds')
 
+    //Installer specifications in form of promise
     return Promise.resolve({
         appDirectory: path.join(outPath, 'seths-network-win32-ia32/'),
         authors: 'SergioRoldan',

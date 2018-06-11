@@ -5,7 +5,7 @@ import { error } from '../util/error';
 import { NotificationsService } from './notifications.service';
 var Datastore = require('nedb');
 
-
+//Where it is injected
 @Injectable({
   providedIn: 'root'
 })
@@ -36,7 +36,7 @@ export class NedbService implements OnInit {
     this.db.accounts.persistence.compactDatafile();
     this.db.channels.persistence.compactDatafile();
 
-    //Force accounts not to be duplicated
+    //Force accounts not to be duplicated by address field
     this.db.accounts.ensureIndex({ fieldName: 'address', unique: true }, (err) => {
       if(err){
         let e = new error('NeDBService', 'Error unique id violated' + err, 'danger');
@@ -46,16 +46,17 @@ export class NedbService implements OnInit {
 
   }
 
+  //Async function to get an account by its address. Asynchronously, returns a promise
   async getAccount(address): Promise<any> {
-    //Return acounts as a promise in async function
+
     try {
-      //Await to findOne function to resolve
+      //Await to findOne function to resolve, synchronously
       let res = await this.findOne(this.db.accounts, { "address": address });
       if(!res || res == null)
         throw("Not found: account");
       
+      //Create an empty account and maps the db js object to this class
       let acc = new account();
-      //Map object to class
       acc.map(res);
 
       return new Promise((resolve, reject) => {
@@ -71,6 +72,7 @@ export class NedbService implements OnInit {
     
   }
 
+  //Async function to get a channel by its address. Asynchronously, returns a promise
   async getChannel(address): Promise<any> {
     //Return channel as a promise in async function
     try {
@@ -78,9 +80,9 @@ export class NedbService implements OnInit {
       let res:any = await this.findOne(this.db.channels, { "channel.address": address });
       if (!res || res == null)
         throw ("Not found: channel");
-      
+
+      //Create an empty channel and maps the db js object to this class
       let chann = new channel();
-      //Map object to class
       chann.map(res.channel);
 
       return new Promise((resolve, reject) => {
@@ -94,6 +96,7 @@ export class NedbService implements OnInit {
     }
   }
 
+  //Async function to get all channels by its account. Asynchronously, returns a promise
   async getChannels(account): Promise<any> {
     //Return channels as a promise in async function
     try {
@@ -103,9 +106,9 @@ export class NedbService implements OnInit {
       if (!res || res == null )
         throw ("Not found: channels");
 
+      //For each match: create an empty channel and maps the db js object to this class
       for(let r of res as Array<any>) {
         let chann = new channel();
-        //Map object to class
         chann.map(r.channel);
         channs.push(chann);
       }
@@ -124,6 +127,7 @@ export class NedbService implements OnInit {
     }
   }
 
+  //Async function to get all accounts . Asynchronously, returns a promise
   async getAccounts(): Promise<any> {
     //Return accounts as a promise in async function
     try {
@@ -133,9 +137,9 @@ export class NedbService implements OnInit {
       if (!res || res == null)
         throw ("Not found: accounts");
 
+      //For each match: create an empty account and maps the db js object to this class
       for(let r of res as Array<any>) {
         let acc = new account();
-        //Map object to class
         acc.map(r);
         accs.push(acc);
       }
@@ -154,6 +158,7 @@ export class NedbService implements OnInit {
     }
   }
 
+  //Insert an account in db, asychronous
   insertAccount(account: account) {
     this.db.accounts.insert(account, (err, newDoc) => {
       if (err) {
@@ -165,6 +170,7 @@ export class NedbService implements OnInit {
     });
   }
 
+  //Insert a channel in db, asychronous
   insertChannel(account, channel: channel) {
     this.db.channels.insert({ account: account, channel: channel }, (err, newDoc) => {
       if (err) {
@@ -176,6 +182,7 @@ export class NedbService implements OnInit {
     });
   }
 
+  //Delete an account in db by its address, asychronous
   deleteAccount(address) {
     //Define match filter
     this.db.accounts.remove({ "address": address }, (err, numRemoved) => {
@@ -188,6 +195,7 @@ export class NedbService implements OnInit {
     });
   }
 
+  //Delete a channel in db by its address, asychronous
   deleteChannel(address) {
     //Define match filter
     this.db.channels.remove({ "channel.address": address }, (err, numRemoved) => {
@@ -200,6 +208,7 @@ export class NedbService implements OnInit {
     });
   }
 
+  //Update a channel in db by its address, asychronous
   updateChannel(account, channel: channel, upsert?) {
     //Define match filter and update parameters
     this.db.channels.update({ "channel.address": channel.address, "account": account }, { account: account, channel: channel }, upsert || {}, (err, numReplaced) => {
@@ -212,6 +221,7 @@ export class NedbService implements OnInit {
     });
   }
 
+  //Update an account in db by its address, asychronous
   updateAccount(account: account, upsert?) {
     //Define match filter and update parameters
     this.db.accounts.update({ "address": account.address }, account, upsert || {}, (err, numReplaced) => {
@@ -225,8 +235,10 @@ export class NedbService implements OnInit {
   }
 
   //Define finds as promises not callbacks, default by NeDB without direct support for promises. To chain promises purposes
+  //and to define a unique way to interact with remote sources
 
   findOne(db, query): Promise<any> {
+    //Define findOne callback as promise
     return new Promise((resolve, reject) => {
       db.findOne(query, (err, doc) => {
         if(err) 
@@ -236,8 +248,8 @@ export class NedbService implements OnInit {
       });
     }); 
   }
-
   findAll(db, query): Promise<any> {
+    //Define find callback as promise
     return new Promise((resolve, reject) => {
       db.find(query, (err, docs) => {
         if (err) 

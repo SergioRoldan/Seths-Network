@@ -15,6 +15,7 @@ const contract = require('truffle-contract');
 const factoryArtifacts = require('../../build/contracts/Factory.json');
 const channelArtifacts = require('../../build/contracts/ChannelFinal.json');
 
+//Where the service is injected
 @Injectable({
   providedIn: 'root'
 })
@@ -28,7 +29,7 @@ export class Web3Service implements OnInit {
   accounts: account[] = [];
   channels: Map<string, channel[]> = new Map();
 
-  // Behavior subjects and observables
+  // Behavior subjects and its observables
   private accountsSource = new BehaviorSubject<account[]>(this.accounts);
   private channelsSource = new BehaviorSubject<Map<string, channel[]>>(this.channels);
   accounts$ = this.accountsSource.asObservable();
@@ -43,8 +44,8 @@ export class Web3Service implements OnInit {
 
   ngOnInit(){}
 
+  //Instanciate web3 provider to work with our local node
   instantiateWeb3() {
-
     try{
       if (typeof this.web3 !== 'undefined') {
         // Use Mist/MetaMask's provider
@@ -60,9 +61,9 @@ export class Web3Service implements OnInit {
     } catch(e) {
       alert(e);
     }
-    
   }
 
+  //Retrieve accounts stored in NeDB, asynchronously as a promise
   retrieveAccountsFromDB() {
 
     this.neDBService.getAccounts().then(val => {
@@ -79,6 +80,7 @@ export class Web3Service implements OnInit {
 
   }
 
+  //Retrieve accounts and its balance from our node using web3, asynchronously as promises
   retrieveAccountsFromEth() {
 
     this.web3.eth.getAccounts((err, accs) => {
@@ -93,7 +95,7 @@ export class Web3Service implements OnInit {
       }
 
       for (let acc of accs) {
-        //Get balance
+        //Get balance, asynchronously as promise
         this.web3.eth.getBalance(acc, (err, val) => {
           if (err != null) {
             let e = new error('Web3Service', 'Error retrieving accounts balance' + err, 'danger');
@@ -120,9 +122,10 @@ export class Web3Service implements OnInit {
     });
   }
 
+  //Set web3 providers for truffle-contract library and fix the difference between web3 v1.0.0 and web3 v.0.20.23
   setProviders() {
 
-    // Fix difference for httpProvider bettween web3 v1 and web3 v0.20 used by truffle-contract
+    // Fix difference for httpProvider between web3 v1.0.0 and web3 v0.20.23, the last used by truffle-contract
     Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send
 
     // Bootstrap the abstractions for Use.
@@ -131,14 +134,16 @@ export class Web3Service implements OnInit {
 
   }
 
+  //Process a new channel event fired by the Factory smart contract that include self address as far end of the channel
   channelProcessedEventFar(self) {
+    //Check if factory is deployed and chain promises
     this.Factory.deployed()
       .then((instance) => {
         
         //Define the filter
         let ev = instance.channelProcessed({ FarEnd: self.address }, { fromBlock: self.lastBlockScr});
         
-        //Watch from 'fromBlock' matching 'FarEnd' restriction
+        //Watch from 'fromBlock' matching 'FarEnd' restriction, as promise
         ev.watch((err, res) => {
           if (err != null) {
             let e = new error('Web3Service', 'Error processing new channel event' + err, 'danger');
@@ -146,7 +151,7 @@ export class Web3Service implements OnInit {
             return;
           }
 
-          //Notify all about the new event catch
+          //Notify all about the new event catch, including the address route to the account associated with the channel
           let objects = 'accounts/'+JSON.stringify(self);
           let n = new notification('Web3Service', 'New channels event catch '+ res.args.ContractAddrs + ' at '+ self.address, 'info', objects);
           this.notificationsService.addNotificationsSource(n);
@@ -172,7 +177,8 @@ export class Web3Service implements OnInit {
       });
   }
 
-  // Delete when migrating to production. Just for development purposes. Same as the previous function modifying the filter
+  // Delete when migrating to production. Just for development purposes, not really necessary.
+  //Same as the previous function modifying the filter to catch events that include self address as near end of the channel
   channelProcessedEventNear(self) {
     this.Factory.deployed()
       .then((instance) => {
@@ -209,9 +215,10 @@ export class Web3Service implements OnInit {
       });
   }
 
+  //Asyc function to create a new channel using the factory. The function is returned as a promise
   async createNewChannel(self, receiver, amount, days): Promise<any> {
     
-    //Check if factory is deployed
+    //Check if factory is deployed, synchronously
     let instance = await this.Factory.deployed();
 
     //Return the promise of createChannel RPC
@@ -223,13 +230,14 @@ export class Web3Service implements OnInit {
       
   }
 
+  //Process a channel accepted emitted for the channel channel associated with the account self
   channelAcceptedEvent(self, channel: channel): any {
 
     // Define channel contract instance and define the filter
     let instance = this.Channel.at(channel.address);
     let evt = instance.channelAccepted({}, { fromBlock: channel.lastBlockScr });
     
-    //Watch for event according to the filter
+    //Watch for event according to the filter, asynchronously as promise
     evt.watch((error, result) => {
       if (error != null) {
         let e = new error('Web3Service', 'Error processing accept channel event' + error, 'danger');
@@ -257,9 +265,10 @@ export class Web3Service implements OnInit {
       
   }
 
+  //Async function to accept a channel channel from an account self. Function is returned as a promise
   async acceptChannel(contract, self, value): Promise<any> {
 
-    //Await to instanciate contract channel
+    //Await to instanciate contract channel, synchronously
     let instance = await this.Channel.at(contract);
 
     //Return promise of acceptChannel RPC
@@ -270,7 +279,10 @@ export class Web3Service implements OnInit {
     });
   }
 
+  //Async function to update the state of a channel channel from an account self according to update parameters. 
+  //Function is returned as a promise
   async updateState(contract, self, updateParameters: updateParams): Promise<any> {
+    
     let instance = await this.Channel.at(contract);
 
     //Return promise of updateState RPC
@@ -286,6 +298,7 @@ export class Web3Service implements OnInit {
     );
   }
 
+  //Process the state updated event fired from a channel channel linked to account self
   updateStateEvent(self, channel: channel): any {
     let instance = this.Channel.at(channel.address);
     
@@ -300,7 +313,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      //Like the rest of events
+      //Notify all and update channel and account, like the rest of events
       let objects = 'accounts/' + JSON.stringify(this.getAccountFromAddress(self)) + '/channels/' + JSON.stringify(channel);
       let n = new notification('Web3Service', 'Update state event catch ' + channel.address, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
@@ -323,6 +336,7 @@ export class Web3Service implements OnInit {
 
   }
 
+  //Process the random shown event fired by a channel channel linked to the account self
   randomShowedEvent(self, channel: channel) {
     let instance = this.Channel.at(channel.address);
     
@@ -337,7 +351,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      //Like the rest of events
+      //Notify all and update channel and account, like the rest of events
       let objects = 'accounts/' + JSON.stringify(this.getAccountFromAddress(self)) + '/channels/' + JSON.stringify(channel);
       let n = new notification('Web3Service', 'Random showed event catch ' + channel.address, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
@@ -350,6 +364,8 @@ export class Web3Service implements OnInit {
     return ev;
   }
 
+  //Async function to dispute the state of a channel channel from an account self according to dispute parameters. 
+  //Function is returned as a promise
   async disputeState(contract, self, disputeParameters): Promise<any> {
     let instance = await this.Channel.at(contract);
 
@@ -366,6 +382,7 @@ export class Web3Service implements OnInit {
     );
   }
 
+  //Process the state disputed event fired from a channel channel linked to account self
   disputeStateEvent(self, channel: channel) {
 
     let instance = this.Channel.at(channel.address);
@@ -381,7 +398,7 @@ export class Web3Service implements OnInit {
         return;
       }
       
-      //Like the rest of events
+      //Notify all and update channel and account, like the rest of events
       let objects = 'accounts/' + JSON.stringify(this.getAccountFromAddress(self)) + '/channels/' + JSON.stringify(channel);
       let n = new notification('Web3Service', 'Dispute state event catch ' + channel.address, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
@@ -397,6 +414,7 @@ export class Web3Service implements OnInit {
 
   }
 
+  //Async function to close a channel. Functions is returned as a promise
   async closeChannel(contract, self, bool): Promise<any> {
     let instance = await this.Channel.at(contract);
 
@@ -410,6 +428,7 @@ export class Web3Service implements OnInit {
     );
   }
 
+  //Process a close request event fired from a channel channel linked to account self
   channelCloseRequestEvent(self, channel: channel) {
     let instance = this.Channel.at(channel.address);
     
@@ -424,7 +443,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      //Like the rest of the events
+      //Notify all and update channel and account, like the rest of events
       this.updateLastBlock(res.blockNumber);
       let objects = 'accounts/' + JSON.stringify(this.getAccountFromAddress(self)) + '/channels/' + JSON.stringify(channel);
       let n = new notification('Web3Service', "Close request from " + res.args.end + " catch at " + self, 'info', objects);
@@ -440,6 +459,7 @@ export class Web3Service implements OnInit {
 
   }
 
+  //Async function to unlock funds of a channel. Functions is returned as a promise
   async unlockFunds(contract, self): Promise<any> {
     let instance = await this.Channel.at(contract);
 
@@ -452,6 +472,7 @@ export class Web3Service implements OnInit {
     );
   }
 
+  //Process the close event of a channel channel linked to the account self
   channelCloseEvent(self, channel: channel) {
     let instance = this.Channel.at(channel.address);
 
@@ -466,7 +487,7 @@ export class Web3Service implements OnInit {
         return;
       }
 
-      //Like the rest of events
+      //Notify all and update channel and account, like the rest of events
       channel.setClosed();
       channel.nearEndValue = this.web3.utils.fromWei(res.args.nearEndFinalValue.toString());
       channel.farEndValue = this.web3.utils.fromWei(res.args.farEndFinalValue.toString());
@@ -485,6 +506,7 @@ export class Web3Service implements OnInit {
 
   }
 
+  //Update the behavior subject accounts source and notify the observers through the observable using next
   updateAccountSource(account: account, modify = false) {
     //Check if the source needs to modify an existing account or add a new one
     if (modify) {
@@ -506,6 +528,7 @@ export class Web3Service implements OnInit {
 
   }
 
+  //Update the behavior subject channels source and notify the observers through the observable using next
   updateChannelsSource(account: any, channel: channel, modify = false, inDb = false) {
 
     //Check if channel already exists and we want to modify it or we need to add a new one
@@ -543,6 +566,7 @@ export class Web3Service implements OnInit {
     this.channelsSource.next(this.channels);
   }
 
+  //Update account balance asynchronously, using a promise
   updateBalance(account: account) {
     //Update Balance of an account
     this.web3.eth.getBalance(account.address, (err, val) => {
@@ -560,6 +584,8 @@ export class Web3Service implements OnInit {
 
   //Utils
 
+  //Update in db and in each channel the last block scrutinized to avoid catching events multiple time or going to deeper in 
+  //the chain to catch past catched events
   updateLastBlock(lastBlockScrutinized) {
     //Update all channels and accounts last block scrutinized
     for(let acc of this.accounts) {
@@ -575,6 +601,7 @@ export class Web3Service implements OnInit {
     }
   }
 
+  //Get the account which address is address
   getAccountFromAddress(address): account {
     for(let acc of this.accounts)
       if(acc.address == address)
@@ -583,7 +610,7 @@ export class Web3Service implements OnInit {
     return null;
   }
 
-  //Define sleep as a promise
+  //Define sleep as a promise due to node event loop asynchronous operation
   sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
   }
