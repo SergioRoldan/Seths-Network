@@ -93,6 +93,9 @@ In root dir of the project, in order to create build and dist folders and run th
 - II-A1. Alternatively run: "#npm run compile-eth" or "#truffle compile" and then the previous command (to force contracts compilation and build before deployment)
 
 
+IMPORTANT ! Each time ganache is restarted you should delete the database to don't keep inexistent channels, to do so just click on delete dbs on the bottom of the screen and relaunch the app, or use dev tools to delete NeDB in applications tab and relaunch the app.
+
+
 - III. To start the client: "#npm run electron-build"
 
 - III-A1. Alternatively to start the client point index.html to localhost:4200 (currently pointing to "./"), use "#ng serve" and then "#npm run electron" (this allows automatic reload of the app if the code changes)
@@ -134,6 +137,8 @@ The app uses angular HTTP, Forms, Browser and Routing modules
 Web3 uses events thrown by the smart contract to update the local database and truffle-contracts to interact with this contracts
 
 NeDB is used an indexedDB storing information in the browser
+
+The app uses web3utils for hashing through soliditySha3 to commpute keccak256 hash exactly in the same way than solidity to make sure that the signature are correctly generated and will be correctly verified
 
 ## Project folder distribution
 

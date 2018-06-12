@@ -23,6 +23,10 @@ th, td {
 
 tr:hover {background-color: #e0e0e0;}
 
+.margin {
+  margin: 20px
+}
+
 /*
 !important is required to problems with angular native styles
 */

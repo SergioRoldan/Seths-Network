@@ -22,19 +22,12 @@ export class NedbService implements OnInit {
     //Instanciate dbs
     this.db.accounts = new Datastore({ filename: 'accounts.db', inMemoryOnly: false, autoload: true });
     this.db.channels = new Datastore({ filename: 'channels.db', inMemoryOnly: false, autoload: true });
-
-    /* Erase the db, just for development purposes
-      this.db.accounts.remove({}, { multi: true }, function (err, numRemoved) {
-        this.db.accounts.loadDatabase(function (err) {});
-      });
-      this.db.channels.remove({}, { multi: true }, function (err, numRemoved) {
-        this.db.channels.loadDatabase(function (err) {});
-      });
-    */
-
+    
     //Force the prune of old files
     this.db.accounts.persistence.compactDatafile();
     this.db.channels.persistence.compactDatafile();
+
+    //this.dropDBs();
 
     //Force accounts not to be duplicated by address field
     this.db.accounts.ensureIndex({ fieldName: 'address', unique: true }, (err) => {
@@ -258,6 +251,42 @@ export class NedbService implements OnInit {
         resolve(docs);
       });
     }); 
+  }
+
+  //Erase the dbs, just for development purposes
+  dropDBs() {
+    var self = this;
+    
+    var DBDeleteRequest = indexedDB.deleteDatabase("NeDB");
+
+    DBDeleteRequest.onerror = function () {
+      console.log("Error deleting database.");
+    };
+
+    //Delete de dbs and recreate and reinstanciate them
+    DBDeleteRequest.onsuccess = function () {
+      console.log("Database deleted successfully");
+
+      self.db.accounts = new Datastore({ filename: 'accounts.db', inMemoryOnly: false, autoload: true });
+      self.db.channels = new Datastore({ filename: 'channels.db', inMemoryOnly: false, autoload: true });
+
+      //Force the prune of old files
+      self.db.accounts.persistence.compactDatafile();
+      self.db.channels.persistence.compactDatafile();
+
+      //Force accounts not to be duplicated by address field
+      self.db.accounts.ensureIndex({ fieldName: 'address', unique: true }, (err) => {
+        if (err) {
+          let e = new error('NeDBService', 'Error unique id violated' + err, 'danger');
+          self.notificationsService.addErrorSource(e);
+        }
+      });
+
+      console.log("Database recreated");
+
+    };
+
+
   }
 
 }

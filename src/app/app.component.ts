@@ -114,5 +114,10 @@ export class AppComponent implements OnInit {
     this.router.navigate(['/notifications']);
   }
 
+  //Drop dbs
+  dropDBs() {
+    this.nedbService.dropDBs();
+  }
+
 
 }
