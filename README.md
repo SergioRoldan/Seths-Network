@@ -1,6 +1,6 @@
 # Seths Network
 
-Proof-of-concept of [Scalability Issues in the Blockchain] () final grade project by SergioRoldan
+Proof-of-concept of [Scalability Issues in the Blockchain]s() final grade project by SergioRoldan
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.3.
 
@@ -8,17 +8,17 @@ Tested in Windows 10 with Ganache
 
 ## Requirements
 
-[Node] () 9.7.1 or inferior
+[Node](https://nodejs.org/es/) 9.7.1 or inferior
 
 Nmp 5.6.0 or inferior (new versions of node crash installing the modules, working to fix this)
 
-[Truffle] () 4.0.0 (not tested with other versions)
+[Truffle](https://truffleframework.com/) 4.0.0 (not tested with other versions)
 
-[Angular] () CLI 1.2 or superior (otherwise change angular.json for angular-cli.json)
+[Angular](https://angular.io) CLI 1.2 or superior (otherwise change angular.json for angular-cli.json)
 
-[Ganache] () prefered, Geth, Testrpc or similar (use port 7545, Ganache default port, or modify truffle-config.js file to point to another port)
+[Ganache](http://truffleframework.com/ganache/) prefered, Geth, Testrpc or similar (use port 7545, Ganache default port, or modify truffle-config.js file to point to another port)
 
-[Electron Packager] () 12.0.1 (not tested with other versions) necessary to pack electron app
+[Electron Packager](https://github.com/electron-userland/electron-packager) 12.0.1 (not tested with other versions) necessary to pack electron app
 
 ## Installation
 
@@ -26,7 +26,7 @@ Clone project using: "#git clone https://github.com/SergioRoldan/Angular6-Truffl
 
 Install modules in the root of the project using: #npm install
 
-Include/modify the next line in the following file, otherwise angular won't compile correctly:
+Include/modify the next line in the following file, otherwise angular will throw an error building and serving:
 
 'node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js':
     
@@ -34,7 +34,7 @@ Include/modify the next line in the following file, otherwise angular won't comp
 
     + node: {crypto:true, stream:true},
 
-This solves Angular 6 strip of crypto and stream libraries, which are truffle-contracts library dependencies
+(this solves Angular 6 strip of crypto and stream libraries, which are truffle-contracts library dependencies)
 
 If typings.d.ts is not in the project include it with the following code under the src folder:
 
@@ -77,33 +77,34 @@ Revise truffle-config.js to check truffle configuration
 
 Revise debian.json if you want to create an installer for the packaged app for Debian systems
 
-Note: main.js is the entry point for Electron, revise and modify it commenting or uncommenting line according to your requirements
+main.js is the entry point for Electron, revise and modify it commenting or uncommenting lines according to your requirements
 
 Feel free of revise and modify any configuration file under src folder, most of them remain as default
 
 ## Run
 
-In root dir of the project, in order to create build and dist folders and run the app:
+In root dir of the project, in order to create build and dist folders and run the app execute the following in the order stipulated:
 
-- Run Ganache (prefered) or similar (TestRPC, Geth, Parity... allowing RPC calls on port 7545 by default)
-
-- I. To compile and deploy contracts use: "#npm run migrate-eth" or "#truffle migrate" (each time Ganache is relaunched)
-
-- II. Alternatively run: "#npm run compile-eth" or "#truffle compile" and then the previous command (to force contracts compilation and build)
+- I. Run Ganache (prefered) or similar (TestRPC, Geth, Parity... allowing RPC calls on port 7545, by default)
 
 
-- I. To start the client: "#npm run electron-build"
+- II. To compile and deploy contracts use: "#npm run migrate-eth" or "#truffle migrate" (each time Ganache is relaunched)
 
-- II. Alternatively to start the client use "#ng serve", point index.html to localhost:4200 (currently pointing to "./") and then "#npm run electron"
+- II-A1. Alternatively run: "#npm run compile-eth" or "#truffle compile" and then the previous command (to force contracts compilation and build before deployment)
 
-- III. Alternatively run "#npm run electron" once the project is built
 
-- IV.1 Alternatively package the app for your distro using "#npm run package-win", "#npm run package-mac" or "#npm run package-linux"
-- IV.1 (Optional) Create the installer for your distro using "#npm run create-installer-mac", "#npm run create-debian-installer" or "#npm run create-win-installer" once the app is packages according to your distro
-- IV.2 Use the .exe, .dmg or .pak packaged app in release-builds folder according to your distribution 
+- III. To start the client: "#npm run electron-build"
+
+- III-A1. Alternatively to start the client point index.html to localhost:4200 (currently pointing to "./"), use "#ng serve" and then "#npm run electron" (this allows automatic reload of the app if the code changes)
+
+- III-A2. Alternatively run "#npm run electron" once the project is built ("npm run build")
+
+- III-A3-1. Alternatively package the app for your distro using "#npm run package-win", "#npm run package-mac" or "#npm run package-linux"
+- III-A3-Optional. Create the installer for your distro using "#npm run create-installer-mac", "#npm run create-debian-installer" or "#npm run create-win-installer" once the app is packages according to your distro
+- III-A3-2. Use the .exe, .dmg or .pak packaged app in release-builds folder according to your distribution 
 (release-builds is created once app is packaged. You can pack the app for any distro using any distro, but the installer creation only will work for your distribution and probably won't for the others, e.g. You must create the Windows installer in a Windows OS, trying to create a macOS installer or Linux installer in a Windows OS fails)
 
-IMPORTANT ! App must be repackaged each time Ganache is restarted because build folder changes. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This should be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet.
+IMPORTANT ! App must be repackaged each time Ganache is restarted because is necessary to redeploy the contracts and therefore build folder changes. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This will be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet, where factory address is fixed and channels remain even if the node is closed.
 
 ## Definitions
 
@@ -123,6 +124,16 @@ Components are the most basic building block of an UI in an Angular application.
 Modules: Angular defines the NgModule, which differs from and complements the JavaScript (ES2015) module. An NgModule declares a compilation context for a set of components that is dedicated to an application domain, a workflow, or a closely related set of capabilities. An NgModule can associate its components with related code, such as services, to form functional units.
 
 Every Angular app has a root module, conventionally named AppModule, which provides the bootstrap mechanism that launches the application. An app typically contains many functional modules.
+
+The app uses angular and bootstrap styles. 
+
+The app uses angular directives to generate the templates reactively using the MVC model among the ones we can find ngFor, ngIf, {{}} (controller to view binding), [ngModel] (bidirecctional binding between view and controller), [ngClass], [style]...
+
+The app uses angular HTTP, Forms, Browser and Routing modules
+
+Web3 uses events thrown by the smart contract to update the local database and truffle-contracts to interact with this contracts
+
+NeDB is used an indexedDB storing information in the browser
 
 ## Project folder distribution
 
@@ -187,9 +198,28 @@ All important files are selfexplanatory or are commented otherwise.
         - web3.service.ts: Ts service to provide the whole app of a common and unique way to retrieve and send information asynchronouly to the Blockchain using web3. This service also interacts with NeDB service.
         - notifications.service.ts: Ts service to provide the whole app of a common and unique way to send and read notifications emitted by other services or component during the execution of the application.
         - nedb.service.ts: Ts service to provide the whole app of a common and unique way to store and retrieve data from the NeDB indexedDB.
-        - app.module.ts: Root module of the app includings declarations of components and pipes, imports of modules used by the app, providers if any and bootstraps in this case the app component.
+        - app.module.ts: Root module of the app including declarations of components and pipes, imports of modules used by the app, providers if any and bootstraps in this case the app component.
         - app.component.ts: Root component of the application. In charge of initialize the events provided by web3 service.
-        - app-routing.module.ts: Ts module that defines the routing of the application throug router-outlets to define which components should be displayed according to different paths. Specify which routes are available, how should be contructed, which paramets can be added and which components are link to which paths. 
+        - app-routing.module.ts: Ts module that defines the routing of the application throug router-outlets to define which components should be displayed according to different paths. Specifies which routes are available, how should be contructed, which paramets can be added and which components are link to which paths. 
+        - /operation: Component used to interact with a certain channel in different ways, based in forms
+            - .ts: Defines the operation of some validators and the submits of form to interact with the blockchain and NeDB through the web3service
+            - .html: Defines two hidden forms to create or update/dispute a channel, depending on the operation passed to its component in the URL
+        - /notifications: Component used to display notifications and errors/warnings and interact with them
+            - .ts: Defines how the interaction with errors and notifications is done
+            - .html: Defines two possibly hidden lists or notifications and errors and allow the interaction with them
+        - /main: Component used to display all accounts available with its address and balance and navigate to them
+            - .ts: Defines how to nagivate to each of the accounts displayed
+            - .html: Defines the list of accounts using a filter through a searchBar
+        - /lightning: To be developed as part of the off-chain interaction of the network
+        - /channels: Component used to display all the channels of an account and create a new one
+            - .ts: Defines how to navigate to each of the channels and how to navigate to operations to create a channel
+            - .html: Defines the list of channels using a filter
+        - /channels-details: Compondnt used to display a channel details and allow the interaction with it
+            - .ts: Defines how the navigation and interaction with the contract is done according to validators and the live cycle of the channel
+            - .html: Defines the channels information, the navigation to channel's operations and some channel simple operations
+        - /account: Component used as route parent of channels, channels-dateials and operations associated with an account
+            - .ts: Subscribe to its account of accounts observable
+            - .html: Displays the account info
 
 Also:
 - Readme & License
@@ -197,10 +227,25 @@ Also:
 
 ## Usage
 
-You will see the address/es of your node, click on any of them to see its contracts (empty if any has been created) or to create a new one. Click on a contract to interact with it.
+//Walkthough
+//Video
 
-Contracts should point one of your other accounts to work as expected due to smart contract requirements.
+## Third-party modules
 
-Contracts should be accepted, by the receiver account, to work with them. You can accept, update state, dispute state, request close or unlock funds depending on contract live cycle explained in the TFG paper: [Scalability Issues in the Blockchain] ().
+Apart from Angular, Electron and its dependencies:
 
-Further features on development.
+"async-mutex": "^0.1.3" - Mutex
+
+"bootstrap": "^4.1.1" - Styles
+
+"nedb": "^1.8.0" - DB
+
+"web3": "^1.0.0-beta.34" - Blockchain interaction
+
+"electron-installer-dmg": "^1.0.0" - Installer MacOS
+
+"electron-winstaller": "^2.6.4" - Installer Windows
+
+"truffle-contract": "^3.0.5" - Blockchain interaction
+
+"@types/node": "^8.9.5" - Typings

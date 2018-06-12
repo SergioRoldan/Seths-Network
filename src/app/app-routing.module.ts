@@ -9,13 +9,15 @@ import { OperationComponent } from './operation/operation.component';
 import { LightningComponent } from './lightning/lightning.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 
+//Defines routes at app root level. :something refers to an object or variable encoded in the URL that can be retrieved in the
+//destination components of the route
 const routes: Routes = [
   { path: '', redirectTo: '/main', pathMatch: 'full' },
   { path: 'main', component: MainComponent}, 
   { path: 'notifications', component: NotificationsComponent}, 
   { path: 'accounts/:account', 
     component: AccountComponent,
-    children: [
+    children: [ //Declares subroutes of accounts/:account (e.g. accounts/:account/channels/:channel) as child routes
       { path: 'channels', redirectTo: ''},
       { path: '', component: ChannelsComponent},
       { path: 'ethereum/:options', component: OperationComponent},
@@ -26,7 +28,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  imports:[ RouterModule.forRoot(routes)],
+  imports:[RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
 export class AppRoutingModule { 

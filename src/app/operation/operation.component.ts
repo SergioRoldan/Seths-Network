@@ -19,14 +19,17 @@ export class OperationComponent implements OnInit, OnDestroy {
   account: account;
   channel: channel;
 
+  //Subscribers for observables
   subAccount: any;
   subOperation: any;
 
+  //channelForm parameters
   createAmount: number;
   recipientAddress: string;
   daysOpen: number;
   status_create: string;
 
+  //updateForm parameters
   updateAmount: number;
   updateId: number;
   updateSender: string;
@@ -40,6 +43,7 @@ export class OperationComponent implements OnInit, OnDestroy {
   updateRHVals: any;
   updateDirection: any;
 
+  //Imported validators
   canBeAddress = canBeAddress;
   canBeDays = canBeDays;
   canBeNumber = canBeNumber;
@@ -49,41 +53,53 @@ export class OperationComponent implements OnInit, OnDestroy {
     private notificationsService:NotificationsService) { }
 
   ngOnInit() {
+    //Subscribe to account observable. Any route encoded parameter is seen as an observable to subscribe to. Parent is included 
+    //to take the parameter of the parent route from a children defined in routing module
     this.subAccount = this.route.parent.params.subscribe(params => this.account = JSON.parse(params['account']));
+    //Multiple parameters can be encoded in the URL at different levels or at the same using objects. Subscribe to operation
     this.subOperation = this.route.params.subscribe(params => {
       let options = JSON.parse(params['options']);
-
       this.operation = options['operation'];
-
+      //Subscribe to channel if any
       if(options['channel'] != null && options['channel'] != '') 
         this.channel = options['channel'];
       
     });
   }
 
+  //Unsubscribe on destroy
   ngOnDestroy() {
     this.subAccount.unsubscribe();
     this.subOperation.unsubscribe();
   }
 
+  //Create channel form submit
   createChannel() {
+    //Define constant variables for the form fields to avoid any change due to the double binding nature of the inputs during
+    //the execution of the function
     const createAmount = this.createAmount;
     const createReceiver = this.recipientAddress;
     const createDays = this.daysOpen;
 
+    //Set status
     this.setStatus('Initiating transaction... (please wait)', 'create');
 
+    //Create new channel in the blockchain using web3service. Async, promise
     this.web3Service.createNewChannel(this.account.address, createReceiver, createAmount, createDays).then(result => {
+      //Check if transaction has been mined and executed succesfuly
       if (result.receipt.status == 1) {
         this.setStatus('Transaction complete!', 'create');
         this.web3Service.updateBalance(this.account);
 
+        //Create new notification to notify this action
         let objects = 'accounts/' + JSON.stringify(this.account);
         let not = new notification('Operation', 'Create channel succesfully executed at ' + this.account.address, 'success', objects)
         this.notificationsService.addNotificationsSource(not);
 
+        //Navigate back to accounts
         this.web3Service.sleep(1000).then(() => this.router.navigate(['../../'], {relativeTo: this.route}));
       }
+      //Check if transaction has been mined but not executed succesfuly due to a EVM state revert events
       else if (result.receipt.status == 0)
         this.setStatus('Error creating channel, EVM state reverted', 'create');
     }).catch(error => {
@@ -92,7 +108,10 @@ export class OperationComponent implements OnInit, OnDestroy {
 
   }
 
+  //Update channel form submit
   updateChannel() {
+    //As above but changing the status and fields
+
     this.setStatus('Initiating transaction... (please wait)', 'update');
 
     const send = this.updateAmount;
@@ -107,6 +126,7 @@ export class OperationComponent implements OnInit, OnDestroy {
     let rs;
     let rhvals;
 
+    //Check if any conditional transaction exists within the update
     if (this.updateRandoms && this.updateTTLs && this.updateRHVals && this.updateDirection) {
       rs = this.updateRandoms.split(';');
       ttls = this.updateTTLs.split(';');
@@ -119,6 +139,7 @@ export class OperationComponent implements OnInit, OnDestroy {
       dirs = [];
     }
 
+    //Correct direction and amount values
     if(sender.toString().toLowerCase() == this.channel.farEnd.toString().toLowerCase()) {
       amount = this.channel.farEndValue - send;
       for(let i=0; i< dirs.length; i++) 
@@ -129,9 +150,12 @@ export class OperationComponent implements OnInit, OnDestroy {
   
     if(amount > 0) {
 
+      //Create a new update parameters according to the form
       let params = new updateParams(this.web3Service.web3, sender, chann, amount, id, signature, rs, ttls, rhvals, dirs);
 
+      //Update the state of a channel in the blockchain using web3service and update parameters. Async, promise
       this.web3Service.updateState(this.channel.address, this.account.address, params).then(result => {
+        //As in createChannel()
         if (result.receipt.status == 1) {
           this.channel.paramToChann(params);
           this.web3Service.updateBalance(this.account);
@@ -152,6 +176,7 @@ export class OperationComponent implements OnInit, OnDestroy {
 
   }
 
+  //Analog to update state just changing the blockchain function called to dispute state
   disputeState() {
     this.setStatus('Initiating transaction... (please wait)', 'dispute');
 
@@ -212,6 +237,7 @@ export class OperationComponent implements OnInit, OnDestroy {
 
   }
 
+  //Set status depending on the operation
   setStatus(message: string, operation: string) {
     if(operation == 'create')
       this.status_create = message;
@@ -221,26 +247,32 @@ export class OperationComponent implements OnInit, OnDestroy {
       this.status_dispute = message;
   }
 
+  //Navigate back 
   goBack() {
     this.router.navigate(['../../'], { relativeTo: this.route });
   }
 
+  //Enough ether validator
   enoughEther(amount: string): boolean {
+    //Check if amount canBeNumber
     if (!canBeNumber(amount))
       return false;
 
+    //Check if value is possitive, less than 100 Ether and the account has enough balance to handle the operation
     if (+amount < 0 || +amount > 100 || +amount > +this.account.balance)
       return false;
 
     return true;
   }
 
+  //Enough channel ether validator, similar to enough ether validator
   enoughEtherChannel(amount: string): boolean {
     if (!canBeNumber(amount))
       return false;
 
     let myValue = 0;
 
+    //Check if the sender is the near end or the far end to adapt the value
     if (this.account.address.toLowerCase() == this.channel.farEnd.toLowerCase())
       myValue = this.channel.nearEndValue;
     else if (this.account.address.toLowerCase() == this.channel.nearEnd.toLowerCase())
@@ -252,6 +284,7 @@ export class OperationComponent implements OnInit, OnDestroy {
     return true;
   }
 
+  //Can be bytes32 validator, number with length 66
   canBeBytes32(randoms:string): boolean {
     let rands = randoms.split(';');
 
@@ -262,6 +295,7 @@ export class OperationComponent implements OnInit, OnDestroy {
     return true;
   }
 
+  //Can be number validator for multiple values 
   canBeNumbers(numbers: string): boolean {
     let num = numbers.split(';');
 

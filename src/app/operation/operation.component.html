@@ -1,20 +1,28 @@
+
+<!-- Hidden div containing create operation form-->
 <div class="container center" *ngIf="operation == 'create'">
 
   <h5 class="title is-4">Create channel</h5>
+  <!-- Binding status_create variable from controller to view -->
   <h5 class="title is-5 is-info help">{{status_create}}</h5>
 
+  <!-- channelForm = create new channel form -->
   <form #channelForm="ngForm">
-
+    <!-- Amount field with two validations at angular template level -->
     <div class="field">
       <label class="label">Amount</label>
+      <!-- Double binding of createAmount. From controller to view and vice versa-->
       <p class="control">
         <input [(ngModel)]="createAmount" class="input" type="text" placeholder="1 Ether" name="createAmount" required #createAmountModel="ngModel">
       </p>
+      <!-- Check if model has been selected or written but currently is empty-->
       <div *ngIf="createAmountModel.errors && (createAmountModel.dirty || createAmountModel.touched)" class="help is-danger">
+        <!-- Display error -->
         <p [hidden]="!createAmountModel.errors.required">
           This field is required
         </p>
       </div>
+      <!-- Check if model has been selected or written but the input doens't fullfil enoughEther() validator -->
       <div *ngIf="!createAmountModel.errors && (createAmountModel.dirty || createAmountModel.touched)" class="help is-danger">
         <p [hidden]="enoughEther(createAmount)">
           Must have enough ether and a number
@@ -22,6 +30,7 @@
       </div>
     </div>
 
+    <!-- As above but the field is destinatary -->
     <div class="field">
       <label class="label">Destinatary</label>
       <p class="control">
@@ -33,6 +42,7 @@
           This field is required
         </p>
       </div>
+      <!-- In this case if input fullfils canBeAddress() validator -->
       <div *ngIf="!recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)" class="help is-danger">
         <p [hidden]="canBeAddress(recipientAddress)">
           Must be address format
@@ -40,6 +50,7 @@
       </div>
     </div>
 
+    <!-- As above but the field is days open -->
     <div class="field">
       <label class="label">Days open</label>
       <p class="control">
@@ -50,6 +61,7 @@
           This field is required
         </p>
       </div>
+      <!-- In this case if input fullfils canBeDays() validator -->
       <div *ngIf="!daysOpenModel.errors && (daysOpenModel.dirty || daysOpenModel.touched)" class="help is-danger">
         <p [hidden]="canBeDays(daysOpen)">
           Must be in days format
@@ -57,6 +69,7 @@
       </div>
     </div>
 
+    <!-- Form submit button. Is disabled if any of the validators notifies an error -->
     <div class="field is-grouped">
       <p class="control">
         <button [disabled]="!channelForm.valid" (click)="createChannel()" class="button is-primary">
@@ -69,13 +82,16 @@
 
 </div>
 
-<div class="container center" *ngIf="(operation == 'update' || operation == 'dispute')&& channel != null">
+<!-- Hidden div containing update or dispute operation form, due to the similarities in the parameters -->
+<div class="container center" *ngIf="(operation == 'update' || operation == 'dispute') && channel != null">
 
+  <!-- Tittle and status depending on the operation-->
   <h5 class="title is-4" *ngIf="operation == 'update'">Update channel</h5>
   <h5 class="title is-4" *ngIf="operation == 'dispute'">Dispute channel</h5>
   <h5 class="title is-5 is-info help" *ngIf="operation == 'update'">{{status_update}}</h5>
   <h5 class="title is-5 is-info help" *ngIf="operation == 'dispute'">{{status_dispute}}</h5>
 
+  <!-- As the form and fields in channelForm-->
   <form #updateForm="ngForm">
 
     <div class="field">
@@ -105,6 +121,7 @@
           This field is required
         </p>
       </div>
+      <!-- Modified version of enoughEther() validator -->
       <div *ngIf="!updateAmountModel.errors && (updateAmountModel.dirty ||updateAmountModel.touched)" class="help is-danger">
         <p [hidden]="enoughEtherChannel(updateAmount)">
           Must have enough ether and a number
@@ -122,6 +139,7 @@
           This field is required
         </p>
       </div>
+      <!-- canBeNumber() validator included in enoughEther() and enoughEtherChannel() -->
       <div *ngIf="!updateIdModel.errors && (updateIdModel.dirty ||updateIdModel.touched)" class="help is-danger">
         <p [hidden]="canBeNumber(updateId)">
           Must be number
@@ -139,6 +157,7 @@
           This field is required
         </p>
       </div>
+      <!-- canBeBytes32() validator -->
       <div *ngIf="!updateRandomsModel.errors && (updateRandomsModel.dirty ||updateRandomsModel.touched)" class="help is-danger">
         <p [hidden]="canBeBytes32(updateRandoms)">
           Must be in bytes32 format
@@ -157,6 +176,7 @@
           This field is required
         </p>
       </div>
+      <!-- Modified version of canBeNumber() validator for multiple inputs -->
       <div *ngIf="!updateTTLsModel.errors && (updateTTLsModel.dirty ||updateTTLsModel.touched)" class="help is-danger">
         <p [hidden]="canBeNumbers(updateTTLs)">
           Must be in number format
@@ -205,6 +225,7 @@
       <p class="control">
         <input [(ngModel)]="updateSignature" class="input" type="text" placeholder="(Optional) If omitted will be generated" name="updateSignature" required #updateSignatureModel="ngModel">
       </p>
+      <!-- canBeSignature() validator similar to canBeBytes32() -->
       <div *ngIf="!updateSignatureModel.errors && (updateSignatureModel.dirty ||updateSignatureModel.touched)" class="help is-warning">
         <p [hidden]="canBeSignature(updateSignature)">
           Signature not provided or not in signature format 
@@ -212,6 +233,7 @@
       </div>
     </div>
 
+    <!-- Submit buttons for each of the operations-->
     <div class="field is-grouped" *ngIf="operation == 'update'">
       <p class="control">
         <button (click)="updateChannel()" class="button is-primary">
@@ -219,7 +241,6 @@
         </button>
       </p>
     </div>
-
     <div class="field is-grouped" *ngIf="operation == 'dispute'">
       <p class="control">
         <button (click)="disputeState()" class="button is-primary">
@@ -234,6 +255,7 @@
 
 <br>
 
+<!-- Navigate back -->
 <button (click)="goBack()" class="button is-primary"> Go Back </button>
 
 <br>

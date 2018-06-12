@@ -23,16 +23,17 @@
       <div *ngIf="channel.ttls[index]">
         <p>TTL: {{channel.ttls[index]}}</p>
         <p>Value: {{channel.rhvals[index]}}</p>
-        <p *ngIf="account.address.toLowerCase() == channel.nearEnd.toLowerCase() && channel.direction[index] == 0">Direction: I'm the receiver</p>
-        <p *ngIf="account.address.toLowerCase() == channel.nearEnd.toLowerCase() && channel.direction[index] == 1">Direction: I'm the sender</p>
-        <p *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && channel.direction[index] == 1">Direction: I'm the receiver</p>
-        <p *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && channel.direction[index] == 0">Direction: I'm the sender</p>
+        <p *ngIf="account.address.toLowerCase() == channel.nearEnd.toLowerCase() && channel.direction[index] == '0'">Direction: I'm the receiver</p>
+        <p *ngIf="account.address.toLowerCase() == channel.nearEnd.toLowerCase() && channel.direction[index] == '1'">Direction: I'm the sender</p>
+        <p *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && channel.direction[index] == '1'">Direction: I'm the receiver</p>
+        <p *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && channel.direction[index] == '0'">Direction: I'm the sender</p>
       </div>
       
     </div>
 
     <br>
 
+    <!-- Allow accepting the channel if it's not accepted and we are the far end of the channel-->
     <div *ngIf="account.address.toLowerCase() == channel.farEnd.toLowerCase() && !channel.accepted">
     
       <h5 class="title is-4">Accept channel</h5>

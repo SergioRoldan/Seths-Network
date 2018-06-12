@@ -1,4 +1,5 @@
 <div class="container">
+  <!-- notifications container -->
   <div class="container center" *ngIf="notifications != null && notifications.length > 0">
 
     <h5 class="title is-4"> Notifications</h5>
@@ -15,6 +16,8 @@
         </td>
       </thead>
       <tbody>
+        <!-- tr created for each item of notifications array with a class depending on parameters and with a click response
+             to nagiate to the generator of the alert -->
         <tr class="alert " [ngClass]="{'alert-info': notf.parameters == 'info', 'alert-success': notf.parameters == 'success', 'highlighted': selectedNotifications.includes(notf)}" 
           *ngFor="let notf of notifications" (click)="selectNotification(notf)">
           
@@ -43,6 +46,7 @@
 
   <br>
 
+  <!-- errors container -->
   <div class="container center" *ngIf="errors != null && errors.length > 0">
 
     <h5 class="title is-4"> Errors/Warnings</h5>
@@ -92,12 +96,14 @@
     </button>
   </div>
 
+  <!-- In case notifications and errors are null or empty-->
   <div class="container center" *ngIf="errors != null && notifications != null && errors.length == 0 && notifications.length == 0">
     <p><b>Unfortunately there's nothing new to be checked :(</b></p>
   </div>
 
   <br>
 
+  <!-- Navigate root -->
   <button (click)="goBack()" class="button is-primary">
     Go Root
   </button>

@@ -337,7 +337,7 @@ export class Web3Service implements OnInit {
   }
 
   //Process the random shown event fired by a channel channel linked to the account self
-  randomShowedEvent(self, channel: channel) {
+  randomShownEvent(self, channel: channel) {
     let instance = this.Channel.at(channel.address);
     
     //Define the filter

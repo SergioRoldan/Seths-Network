@@ -24,11 +24,13 @@ export class MainComponent implements OnInit {
     this.updateAccounts();
   }
 
+  //Navigate to the selected account
   selectAccount(account) {
     this.selectedAccount = account;
     this.router.navigate(['/accounts', JSON.stringify(account)]);
   }
 
+  //Subscribe to accounts observable
   updateAccounts() {
     this.web3Service.accounts$.subscribe(accounts => this.accounts = accounts);
   }

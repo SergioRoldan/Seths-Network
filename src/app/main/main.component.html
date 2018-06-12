@@ -1,6 +1,7 @@
 <div class="container center" *ngIf="accounts != null && accounts.length > 0">
   <h5 class="title is-4"> Accounts</h5>
   <br>
+  <!-- Search bar -->
   <input [(ngModel)]="searchText" placeholder="0x275e1..." class="width">
   <table>
     <thead>
@@ -12,6 +13,7 @@
       </td>
     </thead>
     <tbody>
+      <!-- ngFor including a filter of the array accounts using searchText-->
       <tr *ngFor="let acc of accounts | filter: searchText" [class.highlighted]="acc === selectedAccount" (click)="selectAccount(acc)">
         <td>{{acc.address}}</td>
         <td>{{acc.balance}} Ethers</td>

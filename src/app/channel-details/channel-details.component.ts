@@ -29,10 +29,12 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
 
   constructor(private route: ActivatedRoute, private web3Service: Web3Service, private router: Router
     , private notificationsService: NotificationsService) {
+    //Defines the time when the component is created in unix time
     this.now = Date.now();
    }
 
   ngOnInit() {
+    //Subscribes to the account and channel of the route and to the channels in web3service observables
     this.subAcc = this.route.parent.params.subscribe(params => this.account = JSON.parse(params['account']));
     this.subChann = this.route.params.subscribe(params => this.channel = JSON.parse(params['channel']));
     this.web3Service.channels$.subscribe(channels => {
@@ -40,14 +42,18 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
         if(chann.address == this.channel.address) 
           this.channel = chann;
     });
+    //If channel still open, defines a timer to update now to the point when the channel will close
+    //This is required to hidde or show some channel operations related with its live cycle
     if (this.channel.endDate.getTime() < this.now)
       this.web3Service.sleep(this.now - this.channel.endDate.getTime()).then(() => this.now = Date.now());
   }
 
+  //Navigate back
   goBack() {
     this.router.navigate(['../../'], { relativeTo: this.route });
   }
 
+  //Navigate to operations with the update option and this channel
   goUpdate() {
     this.router.navigate(['../../ethereum', JSON.stringify({
       'operation': 'update',
@@ -55,6 +61,7 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
     })], { relativeTo: this.route });
   }
 
+  //Navigate to operations with the dispute option and this channel
   goDispute() {
     this.router.navigate(['../../ethereum', JSON.stringify({
       'operation': 'dispute',
@@ -62,6 +69,7 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
     })], {relativeTo: this.route});
   }
 
+  //Accept the channel on the blockchain using web3service
   acceptChannel() {
     const value = this.acceptAmount;
     
@@ -84,6 +92,7 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  //Request a close of the channel on the blockchain using web3service
   closeChannel() {
     this.web3Service.closeChannel(this.channel.address, this.account.address, true).then(result => {
       if (result.receipt.status == 1) {
@@ -100,6 +109,7 @@ export class ChannelDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  //Unlock the funds of the channel on the blockchain using web3service
   unlockFunds() {
     this.web3Service.unlockFunds(this.channel.address, this.account.address).then(result => {
       if (result.receipt.status == 1) {

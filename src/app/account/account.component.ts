@@ -18,6 +18,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, public router: Router, private web3Service: Web3Service) {}
 
   ngOnInit() {
+    //Subscribe to account observables
     this.sub = this.route.params.subscribe(params => {
       this.account = JSON.parse(params['account']);
       this.web3Service.accounts$.subscribe(accounts => {
@@ -32,6 +33,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 
+  //Navigate root
   navigateRoot() {
     this.router.navigate(['']);
   }

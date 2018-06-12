@@ -23,13 +23,16 @@ th, td {
 
 tr:hover {background-color: #e0e0e0;}
 
+/*
+!important is required to problems with angular native styles
+*/
+
 .rel {
   position: relative !important;
   float: right !important;
   margin-top: 13px !important;
   height: 44px;
   width: 144px;
-
 }
 
 .fixed {

@@ -20,6 +20,7 @@ export class ChannelsComponent implements OnInit, OnDestroy {
 
   constructor(private route: ActivatedRoute, private web3Service: Web3Service, private router: Router) { }
 
+  //Subscribe to the parameter encoded in the URL and the channels observables
   ngOnInit() {
     this.sub = this.route.parent.params.subscribe(params => this.account = JSON.parse(params['account']));
     this.web3Service.channels$.subscribe(channels => {
@@ -31,11 +32,13 @@ export class ChannelsComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 
+  //Navigate to the selected channel
   selectChannel(channel: channel) {
     this.selectedChannel = channel;
     this.router.navigate(['channels', JSON.stringify(channel)], { relativeTo: this.route });
   }
 
+  //Navigate to operations with operation create
   goCreate() {
     this.router.navigate(['ethereum', JSON.stringify({
       'operation': 'create',
