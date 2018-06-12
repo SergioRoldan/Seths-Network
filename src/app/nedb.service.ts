@@ -255,7 +255,6 @@ export class NedbService implements OnInit {
 
   //Erase the dbs, just for development purposes
   dropDBs() {
-    var self = this;
     
     var DBDeleteRequest = indexedDB.deleteDatabase("NeDB");
 
@@ -266,24 +265,6 @@ export class NedbService implements OnInit {
     //Delete de dbs and recreate and reinstanciate them
     DBDeleteRequest.onsuccess = function () {
       console.log("Database deleted successfully");
-
-      self.db.accounts = new Datastore({ filename: 'accounts.db', inMemoryOnly: false, autoload: true });
-      self.db.channels = new Datastore({ filename: 'channels.db', inMemoryOnly: false, autoload: true });
-
-      //Force the prune of old files
-      self.db.accounts.persistence.compactDatafile();
-      self.db.channels.persistence.compactDatafile();
-
-      //Force accounts not to be duplicated by address field
-      self.db.accounts.ensureIndex({ fieldName: 'address', unique: true }, (err) => {
-        if (err) {
-          let e = new error('NeDBService', 'Error unique id violated' + err, 'danger');
-          self.notificationsService.addErrorSource(e);
-        }
-      });
-
-      console.log("Database recreated");
-
     };
 
 
