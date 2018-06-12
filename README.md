@@ -93,9 +93,6 @@ In root dir of the project, in order to create build and dist folders and run th
 - II-A1. Alternatively run: "#npm run compile-eth" or "#truffle compile" and then the previous command (to force contracts compilation and build before deployment)
 
 
-IMPORTANT ! Each time ganache is restarted you should delete the database to don't keep inexistent channels, to do so just click on delete dbs on the bottom of the screen and relaunch the app, or use dev tools to delete NeDB in applications tab and relaunch the app.
-
-
 - III. To start the client: "#npm run electron-build"
 
 - III-A1. Alternatively to start the client point index.html to localhost:4200 (currently pointing to "./"), use "#ng serve" and then "#npm run electron" (this allows automatic reload of the app if the code changes)
@@ -107,7 +104,10 @@ IMPORTANT ! Each time ganache is restarted you should delete the database to don
 - III-A3-2. Use the .exe, .dmg or .pak packaged app in release-builds folder according to your distribution 
 (release-builds is created once app is packaged. You can pack the app for any distro using any distro, but the installer creation only will work for your distribution and probably won't for the others, e.g. You must create the Windows installer in a Windows OS, trying to create a macOS installer or Linux installer in a Windows OS fails)
 
-IMPORTANT ! App must be repackaged each time Ganache is restarted because is necessary to redeploy the contracts and therefore build folder changes. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This will be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet, where factory address is fixed and channels remain even if the node is closed.
+
+IMPORTANT !!! Each time ganache is restarted you should delete the database to don't keep inexistent channels, to do so just click on delete dbs on the bottom of the screen and relaunch the app, or use dev tools to delete NeDB in applications tab and relaunch the app. To relaunch the app just close it and execute "#npm run electron" or using any of the alternative methods
+
+IMPORTANT !! App must be repackaged each time Ganache is restarted because is necessary to redeploy the contracts and therefore build folder changes. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This will be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet, where factory address is fixed and channels remain even if the node is closed.
 
 ## Definitions
 
