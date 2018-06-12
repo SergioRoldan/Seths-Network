@@ -17,7 +17,7 @@
 
 <br>
 
-<button (click)="dropDBs()" class="button margin is-danger">
+<button [disabled]="disabled" (click)="dropDBs()" class="button margin is-danger">
   Drop NeDB indexedDB
 </button>
 

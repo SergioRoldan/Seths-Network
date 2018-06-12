@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   mutex: Mutex;
 
   totalNotifications: number;
+  disabled: boolean = false;
 
 
   constructor(private web3Service: Web3Service, private nedbService: NedbService, 
@@ -117,6 +118,7 @@ export class AppComponent implements OnInit {
   //Drop dbs
   dropDBs() {
     this.nedbService.dropDBs();
+    this.disabled = true;
   }
 
 
