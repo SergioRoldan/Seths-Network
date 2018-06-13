@@ -265,7 +265,7 @@ At this point we will see on the channel details in any of the two mentioned acc
 
 figure
 
-If we click on Update channel, 
+If we click on Update channel...
 
 //Video
 
