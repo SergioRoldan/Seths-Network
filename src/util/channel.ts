@@ -67,33 +67,23 @@ export class channel {
 
     //Get Randoms shown
     getRsShowed(rsShowed: any) {
-        //Check if randoms is empty
+        console.log(rsShowed);
+        //Check if randoms is empty and add new randoms
         if(this.randoms.length >0) {
-            //If it's not, check that each random hashed in hash
-            this.randoms.join(rsShowed);
-            this.generateHashes(this.randoms);
-            
-            for (let r of rsShowed) {
-                let index = this.checkRandomHashesInH(r);
-                if (index != -1)
-                    this.rsShowed.push(index);
-            }
-            //Regenerate hashes consumed by checkRadomHashesInH
-            this.generateHashes(this.randoms);
+            for(let r of rsShowed)
+                if(!this.randoms.includes(r))
+                    this.randoms.push(r);
+
+            this.generateHashes(this.randoms);    
         } else {
-            //If it is, generate hashes
             this.generateHashes(rsShowed);
             this.randoms = rsShowed;
+        }
 
-            //Check that each random hashes in hash
-            for (let r of rsShowed) {
-                let index = this.checkRandomHashesInH(r);
-                if (index != -1)
-                    this.rsShowed.push(index);
-            }
-            //Regenerate hashes consumed by checkRadomHashesInH
-            this.generateHashes(this.randoms);
-            
+        //Add the randoms shown
+        this.rsShowed = [];
+        for (let i = 0; i < this.randoms.length; i++) {
+            this.rsShowed.push(i);
         }
         
     }
