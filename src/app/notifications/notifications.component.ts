@@ -75,7 +75,7 @@ export class NotificationsComponent implements OnInit {
   selectAll() {
     if(this.selectedNotifications.length == this.notifications.length && this.selectedErrors.length == this.errors.length) {
       this.selectedErrors = [];
-      this.selectedNotifications = []
+      this.selectedNotifications = [];
     } else {
       this.selectedErrors = this.errors;
       this.selectedNotifications = this.notifications;

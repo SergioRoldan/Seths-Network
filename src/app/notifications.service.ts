@@ -49,22 +49,28 @@ export class NotificationsService implements OnInit{
 
   //Remove errors
   removeErrorSource(errors: error[]) {
-    for(let e of errors)
-      if(this.errors.includes(e)) {
-        this.errors.splice(this.errors.indexOf(e),1);
+    const errs = Array.from(errors);  
+    
+    for(let i=0; i < errs.length; i++) {
+      if(this.errors.includes(errs[i])) {
+        this.errors.splice(this.errors.indexOf(errs[i]),1);
         this.removeTotalSource();
       }
+    }
     
     this.errorsSource.next(this.errors);
   }
 
   //Remove notifications
   removeNotificationsSource(notifications: notification[]) {
-    for(let n of notifications)
-      if(this.notifications.includes(n)) {
-        this.notifications.splice(this.notifications.indexOf(n), 1);
+    const notfs = Array.from(notifications);
+
+    for(let i=0; i < notfs.length; i++) {
+      if(this.notifications.includes(notfs[i])) {
+        this.notifications.splice(this.notifications.indexOf(notfs[i]), 1);
         this.removeTotalSource();
       }
+    }
 
     this.notificationsSource.next(this.notifications);
   }

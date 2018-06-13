@@ -20,8 +20,6 @@ export class AppComponent implements OnInit {
   mutex: Mutex;
 
   totalNotifications: number;
-  disabled: boolean = false;
-
 
   constructor(private web3Service: Web3Service, private nedbService: NedbService, 
     private notificationsService: NotificationsService, public router: Router) {
@@ -115,10 +113,8 @@ export class AppComponent implements OnInit {
     this.router.navigate(['/notifications']);
   }
 
-  //Drop dbs
-  dropDBs() {
-    this.nedbService.dropDBs();
-    this.disabled = true;
+  navigateConfig() {
+    this.router.navigate(['/configuration']);
   }
 
 

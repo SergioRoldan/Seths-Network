@@ -39,8 +39,18 @@ tr:hover {background-color: #e0e0e0;}
   width: 144px;
 }
 
+.config {
+  height: 44px !important;
+  width: 44px !important;
+  position: relative !important;
+  float: right !important;
+  margin-top: 13px !important;
+  border-radius: 10%;
+  margin-right: 5px;
+}
+
 .fixed {
-  width: 80% !important;
+  width: 60% !important;
   position: relative !important;
   float: left !important;
   color: white !important;

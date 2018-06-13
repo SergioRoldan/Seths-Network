@@ -13,6 +13,7 @@ import { OperationComponent } from './operation/operation.component';
 import { LightningComponent } from './lightning/lightning.component';
 import { FilterPipe } from '../util/filter.pipe';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { ConfigurationComponent } from './configuration/configuration.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { NotificationsComponent } from './notifications/notifications.component'
     OperationComponent,
     LightningComponent,
     FilterPipe,
-    NotificationsComponent
+    NotificationsComponent,
+    ConfigurationComponent
   ],
   imports: [
     BrowserModule,

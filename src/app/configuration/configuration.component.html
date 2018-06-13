@@ -1,0 +1,16 @@
+<div class="container center">
+  <p>Drop the whole indexedDB including all the information within.  Restart the app before taking this action </p>
+  
+  <button [disabled]="disabled" (click)="dropDBs()" class="button is-danger">
+    Drop NeDB indexedDB
+  </button>
+  <br>
+  <br>
+  <p>
+    <b>This action is irreversible, be careful.</b>
+  </p>
+  <br>
+  <button (click)="navigateRoot()" class="button is-info">
+    Go Root
+  </button>
+</div>

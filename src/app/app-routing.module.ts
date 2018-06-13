@@ -8,13 +8,15 @@ import { ChannelsComponent } from './channels/channels.component';
 import { OperationComponent } from './operation/operation.component';
 import { LightningComponent } from './lightning/lightning.component';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { ConfigurationComponent } from './configuration/configuration.component';
 
 //Defines routes at app root level. :something refers to an object or variable encoded in the URL that can be retrieved in the
 //destination components of the route
 const routes: Routes = [
   { path: '', redirectTo: '/main', pathMatch: 'full' },
   { path: 'main', component: MainComponent}, 
-  { path: 'notifications', component: NotificationsComponent}, 
+  { path: 'notifications', component: NotificationsComponent},
+  { path: 'configuration', component: ConfigurationComponent}, 
   { path: 'accounts/:account', 
     component: AccountComponent,
     children: [ //Declares subroutes of accounts/:account (e.g. accounts/:account/channels/:channel) as child routes

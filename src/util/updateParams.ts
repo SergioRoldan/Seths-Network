@@ -38,8 +38,10 @@ export class updateParams {
             this.rsSigned = rsSigned;
 
             for(let v of rhVals) 
-                this.rhVals.push(this.web3.utils.toWei(v, 'ether'));
+                this.rhVals.push(this.web3.utils.toWei(v.toString(), 'ether'));
 
+            console.log(rhVals);
+            
         } else {
             this.rhVals = [];
             this.ttls = ttls;

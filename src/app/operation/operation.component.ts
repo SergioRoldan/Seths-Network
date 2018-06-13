@@ -157,7 +157,7 @@ export class OperationComponent implements OnInit, OnDestroy {
       this.web3Service.updateState(this.channel.address, this.account.address, params).then(result => {
         //As in createChannel()
         if (result.receipt.status == 1) {
-          this.channel.paramToChann(params);
+          this.paramToChann(this.channel, params);
           this.web3Service.updateBalance(this.account);
           this.setStatus('Transaction complete!', 'update');
 
@@ -218,7 +218,7 @@ export class OperationComponent implements OnInit, OnDestroy {
 
       this.web3Service.disputeState(this.channel.address, this.account.address, params).then(result => {
         if (result.receipt.status == 1) {
-          this.channel.paramToChann(params);
+          this.paramToChann(this.channel, params);
           this.web3Service.updateBalance(this.account);
           this.setStatus('Transaction complete!', 'dispute');
 
@@ -235,6 +235,15 @@ export class OperationComponent implements OnInit, OnDestroy {
       });
     }
 
+  }
+
+  //updates the channel according to an update parameters
+  paramToChann(channel: channel, param: any) {
+    channel.hashes = param.hs;
+    channel.randoms = param.rs;
+    channel.ttls = param.ttls;
+    channel.direction = param.ends;
+    channel.rhvals = param.rhVals;
   }
 
   //Set status depending on the operation
@@ -305,5 +314,7 @@ export class OperationComponent implements OnInit, OnDestroy {
 
     return true;
   }
+
+
 
 }

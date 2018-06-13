@@ -70,6 +70,9 @@ export class channel {
         //Check if randoms is empty
         if(this.randoms.length >0) {
             //If it's not, check that each random hashed in hash
+            this.randoms.join(rsShowed);
+            this.generateHashes(this.randoms);
+            
             for (let r of rsShowed) {
                 let index = this.checkRandomHashesInH(r);
                 if (index != -1)
@@ -124,15 +127,6 @@ export class channel {
             }
                 
         return found;
-    }
-
-    //updates the channel according to an update parameters
-    paramToChann(param: any) {
-        this.hashes = param.hs;
-        this.randoms = param.rs;
-        this.ttls = param.ttls;
-        this.direction = param.ends;
-        this.rhvals = param.rhVals;
     }
 
     //Map a js object to channel
