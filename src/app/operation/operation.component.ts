@@ -103,7 +103,7 @@ export class OperationComponent implements OnInit, OnDestroy {
       else if (result.receipt.status == 0)
         this.setStatus('Error creating channel, EVM state reverted', 'create');
     }).catch(error => {
-      console.log("Error creating the channel: " + error);
+      this.setStatus('Error creating channel, EVM state reverted', 'create');
     });
 
   }
@@ -170,7 +170,7 @@ export class OperationComponent implements OnInit, OnDestroy {
         else if (result.receipt.status == 0)
           this.setStatus('Error updating channel, EVM state reverted', 'update');
       }).catch(error => {
-        console.log("Error updating the channel: " + error);
+        this.setStatus('Error updating channel, EVM state reverted', 'update');
       });
     }
 
@@ -231,7 +231,7 @@ export class OperationComponent implements OnInit, OnDestroy {
         else if (result.receipt.status == 0)
           this.setStatus('Error disputing state, EVM state reverted', 'dispute');
       }).catch(error => {
-        console.log("Error disputing state: " + error);
+        this.setStatus('Error disputing state, EVM state reverted', 'dispute');
       });
     }
 

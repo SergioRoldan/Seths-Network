@@ -588,9 +588,11 @@ export class Web3Service implements OnInit {
   //the chain to catch past catched events
   updateLastBlock(lastBlockScrutinized) {
     //Update all channels and accounts last block scrutinized
+
     for(let acc of this.accounts) {
       acc.lastBlockScr = lastBlockScrutinized;
       this.neDBService.updateAccount(acc);
+      this.updateBalance(acc);
 
       let channs = this.channels.get(acc.address);
 
