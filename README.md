@@ -242,7 +242,7 @@ The operation of the app will appear extrange according to the Lightning Network
 
 Once the app is lauched you will see the main page showing the title of the app, the configuration button and notifications on top of the screen. Notifications should appear by default with a number 1 or a number 2 deppending if the DB is empty or not (if the app has been started for first time or the db has been droped). Also, a list with all accounts accesible in your node (if you are using Ganache a list of 10 account) must appear, if not probably your node is not working properly or has not been launched.
 
-![Main page](https://raw.githubusercontent.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box/master/figures/mainpage.jpg?raw=true)
+![Main page](https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box/blob/master/figures/mainpage.JPG?raw=true)
 
 At this point you can click on the account (e.g. 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544) you prefer to start interacting with. The screen will change displaying the balance and address of the selected account on top, and a button to create a channel will appear just above to another button to navigate back to the main page.
 
