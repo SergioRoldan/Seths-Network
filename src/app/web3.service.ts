@@ -168,7 +168,7 @@ export class Web3Service implements OnInit {
           )
 
           //Update last block scrutinized, update account balance just in case and update the source
-          this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
+          this.sleep(300).then(() => this.updateLastBlock(res.blockNumber));
           this.updateBalance(self);
           this.updateChannelsSource(self.address, tmp);
 
@@ -206,7 +206,7 @@ export class Web3Service implements OnInit {
             0
           )
 
-          this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
+          this.sleep(300).then(() => this.updateLastBlock(res.blockNumber));
           this.updateBalance(self);
           this.updateChannelsSource(self.address, tmp);
 
@@ -255,7 +255,7 @@ export class Web3Service implements OnInit {
       channel.value = this.web3.utils.fromWei(result.args.totalValue.toString());
       channel.accepted = true;
       channel.farEndValue = this.web3.utils.fromWei(result.args.farEndValue.toString());
-      this.sleep(1000).then(() => this.updateLastBlock(result.blockNumber));
+      this.sleep(300).then(() => this.updateLastBlock(result.blockNumber));
       this.updateChannelsSource(self, channel, true);
       
     });
@@ -318,7 +318,7 @@ export class Web3Service implements OnInit {
       let n = new notification('Web3Service', 'Update state event catch ' + channel.address, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
 
-      channel.id = res.args.currentId;
+      channel.id = res.args.currentId.toString();
 
       if(res.args.sender.toLowerCase() == channel.nearEnd.toLowerCase()) {
         channel.nearEndValue = this.web3.utils.fromWei(res.args.senderValue.toString());
@@ -328,7 +328,7 @@ export class Web3Service implements OnInit {
         channel.farEndValue = this.web3.utils.fromWei(res.args.senderValue.toString());
       }
       
-      this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
+      this.sleep(300).then(() => this.updateLastBlock(res.blockNumber));
       this.updateChannelsSource(self, channel, true);
     });
 
@@ -357,7 +357,7 @@ export class Web3Service implements OnInit {
       this.notificationsService.addNotificationsSource(n);
       channel.getRsShowed(res.args.random);
       
-      this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
+      this.sleep(300).then(() => this.updateLastBlock(res.blockNumber));
       this.updateChannelsSource(self, channel, true);
     });
 
@@ -403,9 +403,9 @@ export class Web3Service implements OnInit {
       let n = new notification('Web3Service', 'Dispute state event catch ' + channel.address, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
 
-      channel.id = result.args.currentId;
+      channel.id = result.args.currentId.toString();
 
-      this.sleep(1000).then(() => this.updateLastBlock(result.blockNumber));
+      this.sleep(300).then(() => this.updateLastBlock(result.blockNumber));
       this.updateChannelsSource(self, channel, true);
 
     });
@@ -444,7 +444,7 @@ export class Web3Service implements OnInit {
       }
 
       //Notify all and update channel and account, like the rest of events
-      this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
+      this.sleep(300).then(() => this.updateLastBlock(res.blockNumber));
       let objects = 'accounts/' + JSON.stringify(this.getAccountFromAddress(self)) + '/channels/' + JSON.stringify(channel);
       let n = new notification('Web3Service', "Close request from " + res.args.end + " catch at " + self, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
@@ -491,14 +491,14 @@ export class Web3Service implements OnInit {
       channel.setClosed();
       channel.nearEndValue = this.web3.utils.fromWei(res.args.nearEndFinalValue.toString());
       channel.farEndValue = this.web3.utils.fromWei(res.args.farEndFinalValue.toString());
-      channel.id = res.args.finalId;
+      channel.id = res.args.finalId.toString();
 
       let objects = 'accounts/' + JSON.stringify(this.getAccountFromAddress(self)) + '/channels/' + JSON.stringify(channel);
       let n = new notification('Web3Service', "Close event catch " + channel.address, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
 
 
-      this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
+      this.sleep(300).then(() => this.updateLastBlock(res.blockNumber));
       this.updateChannelsSource(self, channel, true);
     });
 
