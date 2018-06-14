@@ -65,32 +65,36 @@ Run under: "#npm run "name""
 | create-installer-mac | Generate Mac OS installer | "electron-installer-dmg ./release-builds/Seths\\ Network-darwin-x64/Seths\\ Network.app seths-network-app --out=release-builds --overwrite" |
 | create-debian-installer | Generate Debian installer | "electron-installer-debian --src release-builds/seths-network-linux-x64/ --arch amd64 --config debian.json" | 
 
-!! create-debian-installer and create-installer-mac doesn't work on Windows distros because electron-installer-debian and electron-installer-dmg can't be installed in not unix OS !!
+```diff
+- !! create-debian-installer and create-installer-mac doesn't work on Windows distros because electron-installer-debian and electron-installer-dmg can't be installed in not unix OS !!
+```
 
 All the following json files are configuration files and are considered self explanatory:
 
-Revise package.json to check node dependencies and other details
+- Revise package.json to check node dependencies and other details
 
-Revise angular.json to check angular cli properties
+- Revise angular.json to check angular cli properties
 
-Revise truffle-config.js to check truffle configuration
+- Revise truffle-config.js to check truffle configuration
 
-Revise debian.json if you want to create an installer for the packaged app for Debian systems
+- Revise debian.json if you want to create an installer for the packaged app for Debian systems
 
-main.js is the entry point for Electron, revise and modify it commenting or uncommenting lines according to your requirements
+- main.js is the entry point for Electron, revise and modify it commenting or uncommenting lines according to your requirements
 
 Feel free of revise and modify any configuration file under src folder, most of them remain as default
 
-## Run
+## Running
 
 In root dir of the project, in order to create build and dist folders and run the app execute the following in the order stipulated:
 
 - I. Run Ganache (prefered) or similar (TestRPC, Geth, Parity... allowing RPC calls on port 7545, by default)
 
 
+
 - II. To compile and deploy contracts use: "#npm run migrate-eth" or "#truffle migrate" (each time Ganache is relaunched)
 
 - II-A1. Alternatively run: "#npm run compile-eth" or "#truffle compile" and then the previous command (to force contracts compilation and build before deployment)
+
 
 
 - III. To start the client: "#npm run electron-build"
@@ -104,10 +108,11 @@ In root dir of the project, in order to create build and dist folders and run th
 - III-A3-2. Use the .exe, .dmg or .pak packaged app in release-builds folder according to your distribution 
 (release-builds is created once app is packaged. You can pack the app for any distro using any distro, but the installer creation only will work for your distribution and probably won't for the others, e.g. You must create the Windows installer in a Windows OS, trying to create a macOS installer or Linux installer in a Windows OS fails)
 
+```diff
+- IMPORTANT !!! Each time ganache is restarted you should delete the database to don't keep inexistent channels, to do so just click on Drop DBs on the configuration screen and relaunch the app, or use dev tools to delete NeDB in applications tab and relaunch the app. To relaunch the app just close it and execute "#npm run electron" or using any of the alternative methods
 
-IMPORTANT !!! Each time ganache is restarted you should delete the database to don't keep inexistent channels, to do so just click on Drop DBs on the configuration screen and relaunch the app, or use dev tools to delete NeDB in applications tab and relaunch the app. To relaunch the app just close it and execute "#npm run electron" or using any of the alternative methods
-
-IMPORTANT !! App must be repackaged each time Ganache is restarted because is necessary to redeploy the contracts and therefore build folder changes. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This will be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet, where factory address is fixed and channels remain even if the node is closed.
+- IMPORTANT !! App must be repackaged each time Ganache is restarted because is necessary to redeploy the contracts and therefore build folder changes. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This will be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet, where factory address is fixed and channels remain even if the node is closed.
+```
 
 ## Definitions
 
@@ -115,16 +120,15 @@ Services: Angular services are substitutable objects that are wired together usi
 
 Angular services are:
 
-    Lazily instantiated – Angular only instantiates a service when an application component depends on it.
-    Singletons – Each component dependent on a service gets a reference to the single instance generated by the service factory.
+Lazily instantiated – Angular only instantiates a service when an application component depends on it.
+
+Singletons – Each component dependent on a service gets a reference to the single instance generated by the service factory.
 
 Angular offers several useful services, but for most applications you'll also want to create your own.
 
-Components: Component decorator allows you to mark a class as an Angular component and provide additional metadata that determines how the component should be processed, instantiated and used at runtime.
+- Components: Component decorator allows you to mark a class as an Angular component and provide additional metadata that determines how the component should be processed, instantiated and used at runtime. Components are the most basic building block of an UI in an Angular application. An Angular application is a tree of Angular components. Angular components are a subset of directives. Unlike directives, components always have a template and only one component can be instantiated per an element in a template.
 
-Components are the most basic building block of an UI in an Angular application. An Angular application is a tree of Angular components. Angular components are a subset of directives. Unlike directives, components always have a template and only one component can be instantiated per an element in a template.
-
-Modules: Angular defines the NgModule, which differs from and complements the JavaScript (ES2015) module. An NgModule declares a compilation context for a set of components that is dedicated to an application domain, a workflow, or a closely related set of capabilities. An NgModule can associate its components with related code, such as services, to form functional units.
+- Modules: Angular defines the NgModule, which differs from and complements the JavaScript (ES2015) module. An NgModule declares a compilation context for a set of components that is dedicated to an application domain, a workflow, or a closely related set of capabilities. An NgModule can associate its components with related code, such as services, to form functional units.
 
 Every Angular app has a root module, conventionally named AppModule, which provides the bootstrap mechanism that launches the application. An app typically contains many functional modules.
 
@@ -138,16 +142,16 @@ Web3 uses events thrown by the smart contract to update the local database and t
 
 NeDB is used an indexedDB storing information in the browser
 
-The app uses web3utils for hashing through soliditySha3 to commpute keccak256 hash exactly in the same way than solidity to make sure that the signature are correctly generated and will be correctly verified
+The app uses web3utils for hashing through soliditySha3 to commpute keccak256 hash exactly in the same way than solidity to make sure that the signatures are correctly generated and will be correctly verified
 
 ## Project folder distribution
 
 All important files are selfexplanatory or are commented otherwise.
 
-/build: Folder where Truffle creates artifacts for smart contracs once they are compiled and deployed (Doesn't exist before migration)
+- /build: Folder where Truffle creates artifacts for smart contracs once they are compiled and deployed (Doesn't exist before migration)
     - /contracts/nameOfTheContract.json: Each of the artifacts of a smart contract including abi, bytecode and abstraction of its
 
-/contracts: Contains smart contracts for the Seths Network
+- /contracts: Contains smart contracts for the Seths Network
     - /libraries/CryptoHandler.sol: Library to handle some cryptographical functions required by the other smart contracts
     - Migrations.sol: Migrations smart contract used by Truffle to keep the version of the rest of the contracts
     - Factory.sol: Includes Factory, ChannelFinal, Modifiers, Multiownable and Expirable smart contracts
@@ -157,28 +161,28 @@ All important files are selfexplanatory or are commented otherwise.
         - ChannelFinal: Defines the operation of a state channel and inherits from the previous 3 smart contracts
         - Factory: Defines the main and public contract of the Seths Network capable of creating channels
 
-/discarted_contracts: Contains smart contracts discarted during the development of the network
+- /discarted_contracts: Contains smart contracts discarted during the development of the network
     - Channel.sol: Non-forwarding channel, first step of the ChannelFinal contract
     - ChannelExtension.sol: Extension to the previous channel to make it able to forward transactions, previous to ChannelFinal
     - Test.sol: Used to test the two previous contracts for security, efficieny and correct operation
 
-/dist: Contains angular-electron app build using production flag (Doens't exist before build)
+- /dist: Contains angular-electron app build using production flag (Doens't exist before build)
     - angular-truffle-dapp/: includes an html index, a styles page and some js files compiled for the ts
 
-/e2e: Folder created by angular to contain e2e definitions, end2end automatic testing
+- /e2e: Folder created by angular to contain e2e definitions, end2end automatic testing
 
-/installers: Contains the files required to create windows installer
+- /installers: Contains the files required to create windows installer
     - windows/createinstaller.js: js file used to create a windows installer once the app is packaged for windows
     - setupEvents.js: Define squirrel events for windows in case of install, uninstall, obsolete or update
 
-/migrations: Contains the files required to deploy smart contracts using truffle migrate
+- /migrations: Contains the files required to deploy smart contracts using truffle migrate
     - 1_initial_migration.js: Deploys the Migration smart contract to the blockchain
     - 2_deploy_contracts.js: Deploys the CryptoHandler library, links it with the Factory and deploys the Factory
 
-/node_modules: Contains node modules (Doesn't exist before npm install)
+- /node_modules: Contains node modules (Doesn't exist before npm install)
     - Should be modified as told at the begining of this file to solve inconsistencies between Angular 6 and Truffle
 
-/release-build: Contains executables of the app packages for Windows, Linux and MacOS & an installer for Windows (Doesn't exist before package targeting any distro)
+- /release-build: Contains executables of the app packages for Windows, Linux and MacOS & an installer for Windows (Doesn't exist before package targeting any distro)
     - Seths Network-darwin-x64: Packaged app for MacOS x64
     - seths-network-linux-x64: Packaged app for Debian x64
     - seths-network-win32-ia32: Packaged app for Windows x32
@@ -186,7 +190,7 @@ All important files are selfexplanatory or are commented otherwise.
     - mac-installer: Installer for the packaged app for MacOS
     - debian-installer: Installer for the packaged app for Debian
 
-/src: Contains the source and configuration files of the application
+- /src: Contains the source and configuration files of the application
     - typings.d.ts: Required to create the typings of the js libraries that doesn't include them by default
     - index.html: Entry point of the application, needs to be modified if the app is served using ng-serve instead of built
     - The rest of .json, .ts and other files under this folder remain untouched
@@ -239,34 +243,66 @@ Walkthrough of the app. The operation of the app will appear extrange according 
 
 Once the app is lauched you will see the main page showing the title of the app, the configuration button and notifications on top of the screen. Notifications should appear by default with a number 1 or a number 2 deppending if the DB is empty or not (if the app has been started for first time or the db has been droped). Also, a list with all accounts accesible in your node (if you are using Ganache a list of 10 account) must appear, if not probably your node is not working properly or has not been launched.
 
-figure
+![Main page](figures/mainpage.jpg?raw=true)
 
-At this point you can click on the account (e.g. 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544) you prefer to start interacting with it. The screen will change displaying the balance and address of the selected account on top, and a button to create a channel will appear just above to another button to navigate back to the main page.
+At this point you can click on the account (e.g. 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544) you prefer to start interacting with. The screen will change displaying the balance and address of the selected account on top, and a button to create a channel will appear just above to another button to navigate back to the main page.
 
-figure
+![Empty account](figures/account_empty.jpg?raw=true)
 
-If you click on Create Channel the view of the app will change, a form to create a channel will appear with three inputs and a submit button. To create a channel just introduce the amount locked in the channel (e.g. 1) in Ethers using . notation for floats, the destinatary (e.g. 0xf17f52151EbEF6C7334FAD080c5704D77216b732) in Ethereum address format, and the time the channel will remain open (e.g. 20) in days being the number an integer. Finally submit clicking on Create Channel. A message indicating the status of the transaction will appear on top of the form. Once the notification is succesfully mined by the blockchain, the app will navigate back to the page where our account info appear. Now a new table will be displayed including the new created channel with a search bar to filter the channels. Also 3 new notification will be fired, two are the events generated by the factory when a new channel is created and the other is the notification generated when a succesful transaction has been executed in the blockchain. 
+If you click on Create Channel the view of the app will change, a form to create a channel will appear with three inputs and a submit button. To create a channel just introduce the amount locked in the channel (e.g. 1) in Ethers using dot notation for floats, the destinatary (e.g. 0xf17f52151EbEF6C7334FAD080c5704D77216b732) in Ethereum address format, and the time the channel will remain open (e.g. 20) in days being the number an integer. Finally submit clicking on Create Channel. A message indicating the status of the transaction will appear on top of the form. Once the notification is succesfully mined by the blockchain, the app will navigate back to the page where our account info appear. Now a new table will be displayed including the new created channel with a search bar to filter the channels. Also 3 new notification will be fired, two are the events generated by the factory when a new channel is created and the other is the notification generated when a succesful transaction has been executed in the blockchain. 
 
-figures
+![Create channel empty](figures/createchannel.jpg?raw=true)
+
+![Create channel](figures/createchannel_1.jpg?raw=true)
+
+![Account with the new channel](figures/account.jpg?raw=true)
 
 If you click on the notification button a new paged will be displayed showing all erros and notifications (if any). You can select notifications/errors one by one click on them, or select them all using the Select all button. To delete them use the Delete selected or Delete all buttons. Each of the notification can be navigated to the channel or account that has generated them by clicking on the check button.
 
-figure
+![Not selected notifications](figures/notif_not_selected.jpg?raw=true)
 
-Going back to our account page where the new channel appears, we can click on the channel to display its details. A button to navigate back will appear. A nothing else for the moment.
+![All selected notifications](figures/notif_selected.jpg?raw=true)
 
-figure
+![Empty notifications](figures/notif_empty.jpg?raw=true)
+
+Going back to our account page where the new channel appears, we can click on the channel to display its details. A button to navigate back will appear, and no more buttons for the moment.
+
+![Channel details](figures/channel_details.jpg?raw=true)
 
 If we navigate back to the main page using Go Root button we can select the destinatary of the channel (e.g. 0xf17f52151EbEF6C7334FAD080c5704D77216b732) where the new channel will appear as well. If we click on it we will see the same information than in the previous figure but a new form will appear at the bottom. This form allow us to accept the channel and lock some funds (e.g. 0.5), this form only appears because we are the far end and the channel is not yet accepted, otherwise the form will be hidden. If we click on accept another status message will appear. When the transaction is succesfuly mined and executed the form will disappear and the accepted parameter of the channel will change to accepted. Also, three new notifications will be fired by analogy to the Create Channel form explained before.
 
-figures
+![Accept with validator](figures/accept_with_validator.jpg?raw=true)
 
-At this point we will see on the channel details in any of the two mentioned accounts two new buttons to update the state or close the channel. If we click on update state a new screen will be displayed with a form to update the state. To update the state we need to include the sender of the state (e.g. 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544 if we clicked on the Update State of the channel details of the channel list of the 0xf17f52151EbEF6C7334FAD080c5704D77216b732 account) that must be the other end of the channel, the far end if we have navigated using the account presented as near end (the one that has created the channel) and the near end otherwise. The total amount send by the sender after a simulated bunch of off-chain transactions (e.g. 0.2) that should be smaller than the funds locker by this account in the channel. The id (e.g. 2) that should be bigger than the last id uploaded to the channel (initally 0). The rest of the parameters are optional because make reference to any number of conditional transaction, let's go make up one conditional just to test its correct behavior. We will add a 32 bytes random (e.g. 0x40e7b8b686ee4dde3517132186a65df96d380ee4f0c88d40c98fec56c706a149 the keccak256 hash of "Some input"), then a ttl in unix time smaller than the close of the channel (e.g. 1530964800 equivalent to 07/07/2018 @ 12:00pm (UTC) ). Then the value send by the conditional transaction (e.g. 0.1) in Ethers. Finally the direction, using 1 for outgoing transactions (from us to the other end) and 0 for ongoing (from the other end to us) (e.g. 1). The signature input should be left black by default, is possible include it if you compute the signature of the message as described in src/utils/updateParams.ts generateSignature() using the keccack256 hashing use by solidity and the signature using the uploader Ethereum account with the ECDSA signature algorithm used by Ethereum. If is left black the app will automatically generate the signature for you, I don't recommend generate your own signature if you don't strictly follow the steps described in updateParams.ts using exactly the same libraries.
+![Accept](figures/accept.jpg?raw=true)
 
-figure
+![Channel details accepted](figures/channel_details_accepted.jpg?raw=true)
 
-If we click on Update channel...
+At this point we will see on the channel details in any of the two mentioned accounts two new buttons to update the state or close the channel. If we click on update state a new screen will be displayed with a form to update the state. To update the state we need to include the sender of the state (e.g. 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544 if we clicked on the Update State of the channel details of the channel list of the 0xf17f52151EbEF6C7334FAD080c5704D77216b732 account) that must be the other end of the channel, the far end if we have navigated using the account presented as near end (the one that has created the channel) and the near end otherwise. The total amount send by the sender after a simulated bunch of off-chain transactions (e.g. 0.2) that should be smaller than the funds locker by this account in the channel. The id (e.g. 11) that should be bigger than the last id uploaded to the channel (initally 0). 
 
+The rest of the parameters are optional because make reference to any number of conditional transaction, let's go make up one conditional just to test its correct behavior. We will add a 32 bytes random (e.g. 0x40e7b8b686ee4dde3517132186a65df96d380ee4f0c88d40c98fec56c706a149 the keccak256 hash of "Some input"), then a ttl in unix time smaller than the close of the channel (e.g. 1530964800 equivalent to 07/07/2018 @ 12:00pm (UTC) ). Then the value send by the conditional transaction (e.g. 0.1) in Ethers. Finally the direction, using 1 for outgoing transactions (from us to the other end) and 0 for ongoing (from the other end to us) (e.g. 1). The signature input should be left black by default, is possible include it if you compute the signature of the message as described in src/utils/updateParams.ts generateSignature() function using the keccack256 hashing used by solidity and the signature using the uploader Ethereum account with the ECDSA signature algorithm used by Ethereum. 
+
+If is left black the app will automatically generate the signature for you, I don't recommend generate your own signature if you don't strictly follow the steps described in updateParams.ts using exactly the same libraries.
+
+![Update channel 1](figures/update_state_1.jpg?raw=true)
+![Update channel 2](figures/update_state_2.jpg?raw=true)
+
+If we click on Update channel an status message indicating the status of the Blockchain transaction will appear. If the transaction is mined and executed correctly the app will automatically navigate back to our account screen. Also 5 new notifications will appear, the first indicated that the transaction has been executed succesfully, two of them come from the event thrown during the update of the channel for each account and the two left are fired for the event thrown during the unlocking of the conditional transaction. 
+
+If we click in the channel we will see the updated parameters, first 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544 has send 0.2 Eth to 0xf17f52151EbEF6C7334FAD080c5704D77216b732, the state should show 0.8 for the first and 0.7 for the second. Because a conditional transaction has been executed correctly being it outgoing 0xf17f52151EbEF6C7334FAD080c5704D77216b732 has send 0.1 Eth to 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544, the state shows 0.6 for the first and 0.9 for the second, in other words is like sending the 0.1 Eth from the first to the second knowing that the first has 0.7 and the second 0.8 before the transaction. Finally, an info alert must appear showing the random shown and the hash of this random. We can upload as many updates as we want during the time the channel remains open, if we introduce any correct input the form validator will notify us diabling the button and showing a message, otherwise if the transaction is incorrect a message saying that the state of the EthereumVirtualMachine has been reverted in the execution of the transaction due to an exception. 
+
+![Channel updated 1](figures/state_updated_with_hlt.jpg?raw=true)
+![Channel updated 2](figures/state_updated_with_hlt_2.jpg?raw=true)
+
+Now we can try to close the channel to unlock the funds. First we need to request a close of the channel from any of the two account (e.g. 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544) using close the channel button. The status of the transaction will appear and once mined and succesfully executed three new notifications will be fired saying that the transaction was succesfully executed and a new request to close the channel has been uploaded to the channel by the account 0x821... If we now navigate to the other account (e.g. 0xf17f52151EbEF6C7334FAD080c5704D77216b732) from the root or using the notification check button, we can request close the channel in the same way. Because this time the channel see a close request of both owners the channel will close and the funds will be distributed among the owners according to the last state uploaded.
+
+![Channel closed and balance updated](figures/balance_closed.jpg?raw=true)
+
+Once the channel is closed any button to interact with the channel will be displayed independently of the live cycle of the channel.
+
+![Channel closed](figures/closed.jpg?raw=true)
+
+Unlock funds and Dispute state button on channel details are hidden due to the live cycle of smart contracts, when the channel expires after the days specified during the creation of the channel a Dispute state button will appear instead of the Update state button. Dispute state form is exactly equal than Update state with the only difference that the contract will only allow us to upload one Dispute, if we try to upload another the status will display an error because EVM state is reverted. Unlock funds will be shown when the settlement time expires, this is one day after the channel expires, distributing the funds in the channel according to the last state updated.
+ 
 //Video
 
 ## Third-party modules
