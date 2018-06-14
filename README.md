@@ -239,7 +239,9 @@ Also:
 
 ## Usage
 
-Walkthrough of the app. The operation of the app will appear extrange according to the Lightning Network definition, but it is just for development purposes because we are generating channels only between accounts we own. Signature and updates will be forged instead of receiving them from a Lightning user for this motive.
+###Walkthrough of the app
+
+The operation of the app will appear extrange according to the Lightning Network definition, but it is just for development purposes because we are generating channels only between accounts we own. Signature and updates will be forged instead of receiving them from a Lightning user for this motive.
 
 Once the app is lauched you will see the main page showing the title of the app, the configuration button and notifications on top of the screen. Notifications should appear by default with a number 1 or a number 2 deppending if the DB is empty or not (if the app has been started for first time or the db has been droped). Also, a list with all accounts accesible in your node (if you are using Ganache a list of 10 account) must appear, if not probably your node is not working properly or has not been launched.
 
