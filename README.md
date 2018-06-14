@@ -1,30 +1,30 @@
 # Seths Network
 
-Proof-of-concept of [Scalability Issues in the Blockchain]s() final grade project by SergioRoldan
+Proof-of-concept of Scalability Issues in the Blockchain final grade project by SergioRoldan.
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.3.
 
-Tested in Windows 10 with Ganache
+Tested in Windows 10 with Ganache.
 
 ## Requirements
 
-[Node](https://nodejs.org/es/) 9.7.1 or inferior
+[Node](https://nodejs.org/es/) 9.7.1 or inferior.
 
-Nmp 5.6.0 or inferior (new versions of node crash installing the modules, working to fix this)
+Nmp 5.6.0 or inferior (new versions of node crash installing the modules, working to fix this).
 
-[Truffle](https://truffleframework.com/) 4.0.0 (not tested with other versions)
+[Truffle](https://truffleframework.com/) 4.0.0 (not tested with other versions).
 
-[Angular](https://angular.io) CLI 1.2 or superior (otherwise change angular.json for angular-cli.json)
+[Angular](https://angular.io) CLI 1.2 or superior (otherwise change angular.json for angular-cli.json).
 
-[Ganache](http://truffleframework.com/ganache/) prefered, Geth, Testrpc or similar (use port 7545, Ganache default port, or modify truffle-config.js file to point to another port)
+[Ganache](http://truffleframework.com/ganache/) prefered. Geth, Parity, Testrpc or similar (use port 7545, Ganache default port, or modify truffle-config.js file to point to another port). Blocked accounts with password or mnemonic not yet implemented.
 
-[Electron Packager](https://github.com/electron-userland/electron-packager) 12.0.1 (not tested with other versions) necessary to pack electron app
+[Electron Packager](https://github.com/electron-userland/electron-packager) 12.0.1 (not tested with other versions) necessary to pack electron app.
 
 ## Installation
 
-Clone project using: "#git clone https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box.git"
+Clone project using: "#git clone https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box.git".
 
-Install modules in the root of the project using: #npm install
+Install modules in the root of the project using: "#npm install".
 
 Include/modify the next line in the following file, otherwise angular will throw an error building and serving:
 
@@ -34,17 +34,17 @@ Include/modify the next line in the following file, otherwise angular will throw
 
     + node: {crypto:true, stream:true},
 
-(this solves Angular 6 strip of crypto and stream libraries, which are truffle-contracts library dependencies)
+(this solves Angular 6 strip of crypto and stream libraries, which are truffle-contracts dependencies).
 
 If typings.d.ts is not in the project include it with the following code under the src folder:
 
     + declare var require: NodeRequire;
 
-This allows node to generate ts typings for js libraries that doesn't provide them
+This allows node to generate ts typings for js libraries that doesn't provide them.
 
 ## Configuration
 
-Run under: "#npm run "name""
+Run under: "#npm run "name"".
 
 | Name  | Usage | Script|
 | --- | --- | --- |
@@ -53,14 +53,15 @@ Run under: "#npm run "name""
 | build  | Build app | "ng build" |
 | test  | Run tests | "ng test" |
 | lint  | - | "ng lint" |
-| e2e  | - | "ng e2e" |
+| e2e  | Run e2e tests with karma and jasmine | "ng e2e" |
 | truffle  | Truffle dev console | "truffle" |
-| compile-eth  | Compile smart contracts using Truffle generating build in the process | "truffle compile" |
+| compile-eth  | Compile smart contracts using Truffle generating build folder in the process | "truffle compile" |
 | migrate-eth  | Compile and deploy smart contract using Truffle to the network specified in truffle-config.js | "truffle migrate" |
 | electron  | Start electron | "electron ." |
 | electron-build  | Build angular app and serve it with electorn | "ng build --prod && electron ." |
 | package-mac  | Package App targeting Mac OS | "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds" |
 | package-win  | Package App targeting Windows | "electron-packager . seths-network --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/angular-truffle-dapp/favicon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Seths Network\"" |
+| package-linux| Package App targeting Linux | "package-linux": "electron-packager .  seths-network --overwrite --asar=true --platform=linux --arch=x64 --prune=true --out=release-builds" |
 | create-win-installer | Generate Windows installer | "node installers/windows/createinstaller.js" |
 | create-installer-mac | Generate Mac OS installer | "electron-installer-dmg ./release-builds/Seths\\ Network-darwin-x64/Seths\\ Network.app seths-network-app --out=release-builds --overwrite" |
 | create-debian-installer | Generate Debian installer | "electron-installer-debian --src release-builds/seths-network-linux-x64/ --arch amd64 --config debian.json" | 
@@ -71,47 +72,47 @@ Run under: "#npm run "name""
 
 All the following json files are configuration files and are considered self explanatory:
 
-- Revise package.json to check node dependencies and other details
+- Revise package.json to check node dependencies and other details.
 
-- Revise angular.json to check angular cli properties
+- Revise angular.json to check angular-cli properties.
 
-- Revise truffle-config.js to check truffle configuration
+- Revise truffle-config.js to check truffle configuration.
 
-- Revise debian.json if you want to create an installer for the packaged app for Debian systems
+- Revise debian.json if you want to create an installer for the packaged app for Debian systems.
 
-- main.js is the entry point for Electron, revise and modify it commenting or uncommenting lines according to your requirements
+- main.js is the entry point for Electron, revise and modify it commenting or uncommenting lines according to your requirements.
 
-Feel free of revise and modify any configuration file under src folder, most of them remain as default
+Feel free of revise and modify any configuration file under src folder, most of them remain as default.
 
 ## Running
 
 In root dir of the project, in order to create build and dist folders and run the app execute the following in the order stipulated:
 
-- I. Run Ganache (prefered) or similar (TestRPC, Geth, Parity... allowing RPC calls on port 7545, by default)
+- I. Run Ganache (prefered) or similar (TestRPC, Geth, Parity... allowing RPC calls on port 7545, by default).
 
 
 
-- II. To compile and deploy contracts use: "#npm run migrate-eth" or "#truffle migrate" (each time Ganache is relaunched)
+- II. To compile and deploy contracts use: "#npm run migrate-eth" or "#truffle migrate" (each time Ganache is relaunched).
 
-- II-A1. Alternatively run: "#npm run compile-eth" or "#truffle compile" and then the previous command (to force contracts compilation and build before deployment)
+- II-A1. Alternatively run: "#npm run compile-eth" or "#truffle compile" and then the previous command (to force contracts compilation and build before deployment).
 
 
 
-- III. To start the client: "#npm run electron-build"
+- III. To start the client: "#npm run electron-build".
 
-- III-A1. Alternatively to start the client point index.html to localhost:4200 (currently pointing to "./"), use "#ng serve" and then "#npm run electron" (this allows automatic reload of the app if the code changes)
+- III-A1. Alternatively to start the client point index.html to localhost:4200 (currently pointing to "./"), use "#ng serve" and then "#npm run electron" (this allows automatic reload of the app if the code changes).
 
-- III-A2. Alternatively run "#npm run electron" once the project is built ("npm run build")
+- III-A2. Alternatively run "#npm run electron" once the project is built ("npm run build").
 
-- III-A3-1. Alternatively package the app for your distro using "#npm run package-win", "#npm run package-mac" or "#npm run package-linux"
-- III-A3-Optional. Create the installer for your distro using "#npm run create-installer-mac", "#npm run create-debian-installer" or "#npm run create-win-installer" once the app is packages according to your distro
+- III-A3-1. Alternatively package the app for your distro using "#npm run package-win", "#npm run package-mac" or "#npm run package-linux".
+- III-A3-Optional. Create the installer for your distro using "#npm run create-installer-mac", "#npm run create-debian-installer" or "#npm run create-win-installer" once the app is packaged according to your distro.
 - III-A3-2. Use the .exe, .dmg or .pak packaged app in release-builds folder according to your distribution 
-(release-builds is created once app is packaged. You can pack the app for any distro using any distro, but the installer creation only will work for your distribution and probably won't for the others, e.g. You must create the Windows installer in a Windows OS, trying to create a macOS installer or Linux installer in a Windows OS fails)
+(release-builds is created once app is packaged. You can pack the app for any distro using any distro, but the installer creation only will work for your distribution and probably won't for the others, e.g. You must create the Windows installer in a Windows OS, trying to create a macOS installer or Linux installer in a Windows OS fails).
 
 ```diff
 - IMPORTANT !!! Each time ganache is restarted you should delete the database to don't keep inexistent channels, to do so just click on Drop DBs on the configuration screen and relaunch the app, or use dev tools to delete NeDB in applications tab and relaunch the app. To relaunch the app just close it and execute "#npm run electron" or using any of the alternative methods
 
-- IMPORTANT !! App must be repackaged each time Ganache is restarted because is necessary to redeploy the contracts and therefore build folder changes. Installer must be also recreated once the app is repackaged. Otherwise, app won't work because is packaged and installed using non currently existent smart contracts. This will be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet, where factory address is fixed and channels remain even if the node is closed.
+- IMPORTANT !! App must be repackaged each time Ganache is restarted because is necessary to redeploy the contracts, which makes that the build folder changes. Installer must be also recreated once the app is repackaged. Otherwise app won't work because is packaged and installed using non currently existent smart contracts. This will be solved when the smart contracts are deployed in Ropsten testnet or Ethereum mainnet, where factory address is fixed and channels remain even if the node gets closed.
 ```
 
 ## Definitions
@@ -125,21 +126,19 @@ In root dir of the project, in order to create build and dist folders and run th
 
 - Components: Component decorator allows you to mark a class as an Angular component and provide additional metadata that determines how the component should be processed, instantiated and used at runtime. Components are the most basic building block of an UI in an Angular application. An Angular application is a tree of Angular components. Angular components are a subset of directives. Unlike directives, components always have a template and only one component can be instantiated per an element in a template.
 
-- Modules: Angular defines the NgModule, which differs from and complements the JavaScript (ES2015) module. An NgModule declares a compilation context for a set of components that is dedicated to an application domain, a workflow, or a closely related set of capabilities. An NgModule can associate its components with related code, such as services, to form functional units.
-
-Every Angular app has a root module, conventionally named AppModule, which provides the bootstrap mechanism that launches the application. An app typically contains many functional modules.
+- Modules: Angular defines the NgModule, which differs from and complements the JavaScript (ES2015) module. An NgModule declares a compilation context for a set of components that is dedicated to an application domain, a workflow, or a closely related set of capabilities. An NgModule can associate its components with related code, such as services, to form functional units.Every Angular app has a root module, conventionally named AppModule, which provides the bootstrap mechanism that launches the application. An app typically contains many functional modules.
 
 The app uses angular and bootstrap styles. 
 
-The app uses angular directives to generate the templates reactively using the MVC model among the ones we can find ngFor, ngIf, {{}} (controller to view binding), [ngModel] (bidirecctional binding between view and controller), [ngClass], [style]...
+The app uses angular directives to generate the templates reactively using the MVC model among the ones we can find: ngFor, ngIf, {{}} (controller to view binding), [ngModel] (view to controller binding), [ngClass], [style]...
 
-The app uses angular HTTP, Forms, Browser and Routing modules
+The app uses angular HTTP, Forms, Browser and Routing modules.
 
-Web3 uses events thrown by the smart contract to update the local database and truffle-contracts to interact with this contracts
+Web3 uses events thrown by the smart contract to update the local database and truffle-contracts to interact with this contracts.
 
-NeDB is used an indexedDB storing information in the browser
+NeDB is used an indexedDB storing information in the browser.
 
-The app uses web3utils for hashing through soliditySha3 to commpute keccak256 hash exactly in the same way than solidity to make sure that the signatures are correctly generated and will be correctly verified
+The app uses web3utils for hashing through soliditySha3 to commpute keccak256 hash exactly in the same way that solidity does to make sure that the signatures are correctly generated and will be correctly verified.
 
 ## Project folder distribution
 
@@ -301,6 +300,10 @@ Once the channel is closed any button to interact with the channel will be displ
 ![Channel closed](https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box/blob/master/figures/closed.JPG?raw=true)
 
 Unlock funds and Dispute state button on channel details are hidden due to the live cycle of smart contracts, when the channel expires after the days specified during the creation of the channel a Dispute state button will appear instead of the Update state button. Dispute state form is exactly equal than Update state with the only difference that the contract will only allow us to upload one Dispute, if we try to upload another the status will display an error because EVM state is reverted. Unlock funds will be shown when the settlement time expires, this is one day after the channel expires, distributing the funds in the channel according to the last state updated.
+
+Finally the configuration button on the top of the screen next to notifications navigates to configuration component, currectly only a button to drop all the databases appears, read the paragraph above carefully. Once the button is clicked it gets disabled. Once you drop the dbs you must restart the app closing it and relaunching it with "#npm run electron".
+
+![Drop DBs](https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box/blob/master/figures/drop_dbs.JPG?raw=true)
  
 ###Video
 

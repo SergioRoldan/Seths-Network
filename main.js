@@ -28,7 +28,7 @@ function createWindow() {
     win.loadURL(`file://${__dirname}/dist/angular-truffle-dapp/index.html`)
 
     // uncomment below to open the DevTools.
-    win.webContents.openDevTools()
+   // win.webContents.openDevTools()
 
     // comment below to make menu bar appear
     win.setMenu(null);
