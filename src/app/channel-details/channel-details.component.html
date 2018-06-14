@@ -19,7 +19,7 @@
     <div *ngFor="let index of channel.rsShowed" class="alert alert-info">
       Hash locked transaction
       <p>Random: {{channel.randoms[index]}}</p>
-      <p>Hash: {{channel.hashes[index]}}</p>
+      <p>Hash: {{channel.hashes}}</p>
       <!-- Never displayed due to the proof-of-concept operation, completely normal behavior -->
       <div *ngIf="channel.ttls[index]">
         <p>TTL: {{channel.ttls[index]}}</p>

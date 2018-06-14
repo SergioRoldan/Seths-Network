@@ -168,7 +168,7 @@ export class Web3Service implements OnInit {
           )
 
           //Update last block scrutinized, update account balance just in case and update the source
-          this.updateLastBlock(res.blockNumber);
+          this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
           this.updateBalance(self);
           this.updateChannelsSource(self.address, tmp);
 
@@ -206,7 +206,7 @@ export class Web3Service implements OnInit {
             0
           )
 
-          this.updateLastBlock(res.blockNumber);
+          this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
           this.updateBalance(self);
           this.updateChannelsSource(self.address, tmp);
 
@@ -255,7 +255,7 @@ export class Web3Service implements OnInit {
       channel.value = this.web3.utils.fromWei(result.args.totalValue.toString());
       channel.accepted = true;
       channel.farEndValue = this.web3.utils.fromWei(result.args.farEndValue.toString());
-      this.updateLastBlock(result.blockNumber);
+      this.sleep(1000).then(() => this.updateLastBlock(result.blockNumber));
       this.updateChannelsSource(self, channel, true);
       
     });
@@ -328,7 +328,7 @@ export class Web3Service implements OnInit {
         channel.farEndValue = this.web3.utils.fromWei(res.args.senderValue.toString());
       }
       
-      this.updateLastBlock(res.blockNumber);
+      this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
       this.updateChannelsSource(self, channel, true);
     });
 
@@ -357,7 +357,7 @@ export class Web3Service implements OnInit {
       this.notificationsService.addNotificationsSource(n);
       channel.getRsShowed(res.args.random);
       
-      this.updateLastBlock(res.blockNumber);
+      this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
       this.updateChannelsSource(self, channel, true);
     });
 
@@ -405,7 +405,7 @@ export class Web3Service implements OnInit {
 
       channel.id = result.args.currentId;
 
-      this.updateLastBlock(result.blockNumber);
+      this.sleep(1000).then(() => this.updateLastBlock(result.blockNumber));
       this.updateChannelsSource(self, channel, true);
 
     });
@@ -444,7 +444,7 @@ export class Web3Service implements OnInit {
       }
 
       //Notify all and update channel and account, like the rest of events
-      this.updateLastBlock(res.blockNumber);
+      this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
       let objects = 'accounts/' + JSON.stringify(this.getAccountFromAddress(self)) + '/channels/' + JSON.stringify(channel);
       let n = new notification('Web3Service', "Close request from " + res.args.end + " catch at " + self, 'info', objects);
       this.notificationsService.addNotificationsSource(n);
@@ -498,7 +498,7 @@ export class Web3Service implements OnInit {
       this.notificationsService.addNotificationsSource(n);
 
 
-      this.updateLastBlock(res.blockNumber);
+      this.sleep(1000).then(() => this.updateLastBlock(res.blockNumber));
       this.updateChannelsSource(self, channel, true);
     });
 
