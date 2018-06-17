@@ -1,4 +1,4 @@
-#Seths Network
+# Seths Network
 
 Proof-of-concept of Scalability Issues in the Blockchain Final Degree Thesis by SergioRoldan.
 
@@ -322,6 +322,8 @@ Finally the configuration button on the top of the screen next to notifications 
 ![Drop DBs](https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box/blob/master/figures/drop_dbs.JPG?raw=true)
  
 ### Video
+
+![Walkthrough gif](https://github.com/SergioRoldan/Angular6-Truffle-Electron-Dapp-Box/blob/master/figures/seths_network_gif.gif)
 
 ## Third-party modules
 
