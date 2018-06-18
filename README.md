@@ -48,7 +48,7 @@ Include/modify the next line in the following file, otherwise angular will throw
 
 'node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js':
     
-    - node: {},
+    - node: {}, (or "node: false,")
 
     + node: {crypto:true, stream:true},
 
